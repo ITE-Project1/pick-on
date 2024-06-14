@@ -1,5 +1,5 @@
 package com.ite.pickon.domain.order.service;
 
-public class OrderService {
+public interface OrderService {
 
 }

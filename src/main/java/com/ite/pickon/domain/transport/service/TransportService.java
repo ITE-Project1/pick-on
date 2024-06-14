@@ -1,5 +1,5 @@
 package com.ite.pickon.domain.transport.service;
 
-public class TransportService {
+public interface TransportService {
 
 }

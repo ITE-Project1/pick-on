@@ -1,5 +1,5 @@
 package com.ite.pickon.domain.transport.mapper;
 
-public class TransportMapper {
+public interface TransportMapper {
 
 }

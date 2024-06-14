@@ -1,5 +1,5 @@
 package com.ite.pickon.domain.product.mapper;
 
-public class ProductMapper {
+public interface ProductMapper {
 
 }
