@@ -24,12 +24,12 @@ public enum TransportInformation {
 
     private final int toStoreId;
     private final int fromStoreId;
-    private final int transportTime;
+    private final int transportMinutes;
 
-    TransportInformation(int toStoreId, int fromStoreId, int transportTime) {
+    TransportInformation(int toStoreId, int fromStoreId, int transportMinutes) {
         this.toStoreId = toStoreId;
         this.fromStoreId = fromStoreId;
-        this.transportTime = transportTime;
+        this.transportMinutes = transportMinutes;
     }
 
     public int getToStoreId() {
@@ -40,7 +40,7 @@ public enum TransportInformation {
         return fromStoreId;
     }
 
-    public int getTransportTime() {
-        return transportTime;
+    public int getTransportMinutes() {
+        return transportMinutes;
     }
 }
