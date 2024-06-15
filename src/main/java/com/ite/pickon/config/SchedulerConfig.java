@@ -1,20 +1,18 @@
 package com.ite.pickon.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration
-public class SchedulerConfig implements SchedulingConfigurer {
-    private static final int POOL_SIZE = 10;
+public class SchedulerConfig  {
 
-    @Override
-    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(POOL_SIZE);
-        threadPoolTaskScheduler.setThreadNamePrefix("frmm-scheduled-task-pool-");
-        threadPoolTaskScheduler.initialize();
-        scheduledTaskRegistrar.setTaskScheduler(threadPoolTaskScheduler);
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
+        ThreadPoolTaskScheduler threadPoolTaskScheduler
+                = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
+        return threadPoolTaskScheduler;
     }
 }
