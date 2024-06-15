@@ -7,6 +7,6 @@
     <select id="selectStockForStore" resultType="com.ite.pickon.domain.stock.dto.StockVO">
         SELECT store_id, quantity
         FROM stock
-        WHERE product_id = #{productId}
+        WHERE product_id LIKE #{productId}
     </select>
 </mapper>
