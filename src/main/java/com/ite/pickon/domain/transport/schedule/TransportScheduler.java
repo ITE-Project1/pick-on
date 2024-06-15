@@ -29,8 +29,7 @@ public class TransportScheduler {
         LocalDateTime localDateTime = LocalDateTime.of(LocalDate.now(), transportVO.getDepartureTime());
         Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        Date date2 = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
         //지점 연결 후 출발 배차 시간이 되면 배송중으로 상태 변경(배치) PENDING → SHIPPED
-        taskScheduler.schedule(() -> transportService.modifyTransportStatus(orderId), date2);
+        taskScheduler.schedule(() -> transportService.modifyTransportStatus(orderId), date);
     }
 }
