@@ -2,6 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="com.ite.pickon.TransportMapper">
-	
+<mapper namespace="com.ite.pickon.domain.transport.mapper.TransportMapper">
+    <update id="updateStatusByFromStoreId">
+        UPDATE transport_request
+        SET status = 0
+        WHERE from_store_id = #{fromStoreId} AND
+              status = 1;
+    </update>
 </mapper>
