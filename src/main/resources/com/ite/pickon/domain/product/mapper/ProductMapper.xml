@@ -20,4 +20,15 @@
 			</if>
 		OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
 	</select>
+
+	<insert id="insertNewProduct" parameterType="com.ite.pickon.domain.product.dto.ProductVO">
+		insert into product(product_id, name, description, price, image_url)
+		VALUES (#{productId},#{name}, #{description}, #{price}, #{imageUrl})
+	</insert>
+
+	<select id="selectProductDetail" parameterType="String" resultType="com.ite.pickon.domain.product.dto.ProductResponse">
+		select product_id as productId, name, description, price, image_url as imageUrl
+		from product
+		where product_id LIKE #{productId}
+	</select>
 </mapper>
