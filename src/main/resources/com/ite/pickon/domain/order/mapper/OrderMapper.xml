@@ -4,6 +4,20 @@
   
 <mapper namespace="com.ite.pickon.domain.order.mapper.OrderMapper">
 
+    <!-- 주문 생성 -->
+    <insert id="insertOrder">
+        INSERT INTO ORDERS (ORDER_ID, USER_ID, STORE_ID, PRODUCT_ID, PICKUP_DATE, QUANTITY, TOTAL_PRICE, STATUS)
+        VALUES (
+                #{orderReq.orderId},
+                #{userId},
+                #{orderReq.storeId},
+                #{orderReq.productId},
+                CURRENT_TIMESTAMP,
+                #{orderReq.quantity},
+                (SELECT PRICE FROM PRODUCT WHERE PRODUCT_ID = #{orderReq.productId}) * #{orderReq.quantity},
+                1)
+    </insert>
+
     <!-- 주문 목록 조회 -->
     <select id="selectOrderListByStore" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MultiOrderRes">
         SELECT

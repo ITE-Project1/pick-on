@@ -1,12 +1,16 @@
 package com.ite.pickon.domain.order.mapper;
 
 import com.ite.pickon.domain.order.dto.MultiOrderRes;
+import com.ite.pickon.domain.order.dto.OrderReq;
 import com.ite.pickon.domain.order.dto.OrderRes;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface OrderMapper {
+    // 주문 생성
+    void insertOrder(@Param("userId") Long userId, @Param("orderReq") OrderReq orderReq);
+
     // 주문 목록 조회
     List<MultiOrderRes> selectOrderListByStore(@Param("storeId") String storeId,
                                                @Param("offset") int offset,
