@@ -28,7 +28,7 @@ public class TransportController {
         Date date = calendar.getTime();
 
         System.out.println(date);
-        transportScheduler.changeTransportStatus("P002", 1, 1, date, "P00003");
+//        transportScheduler.changeTransportStatus("P002", 1, 1, date, "P00003");
     }
 
 }

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -73,12 +72,10 @@ public class TransportServiceImpl implements TransportService {
         return new TransportVO(optimalSchedule.getStoreId(), optimalSchedule.getDepartureTime(), optimalTime.toLocalTime());
     }
 
-
-
     @Override
     @Transactional
-    public void modifyTransportStatus(String orderId) {
-        transportMapper.updateStatusByOrderId(orderId);
+    public void modifyTransportStatus(int fromStoreId) {
+        transportMapper.updateStatusByFromStoreId(fromStoreId);
     }
 
     private LocalDateTime convertToLocalDateTime(Date date) {
