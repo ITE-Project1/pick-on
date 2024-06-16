@@ -3,5 +3,9 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="com.ite.pickon.domain.transport.mapper.TransportMapper">
-	
+    <update id="updateStatusByOrderId">
+        UPDATE transport_request
+        SET status = 0
+        WHERE order_id LIKE #{orderId}
+    </update>
 </mapper>
