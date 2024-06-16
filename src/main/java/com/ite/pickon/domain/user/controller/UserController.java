@@ -7,6 +7,10 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Log
@@ -23,17 +27,17 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String userAdd(@RequestBody UserVO user, Model model) {
-        user.setRole("general");
-        System.out.println(user);
-        userService.addUser(user);
+    public ResponseEntity<?> userAdd(@RequestBody UserVO user, BindingResult result) {
 
-        return "redirect:/login";
-    }
-
-    @GetMapping("/log-in")
-    public String login() {
-        return "login";
+        try {
+            // 사용자 등록
+            user.setRole("general");
+            System.out.println(user);
+            userService.addUser(user);
+            return ResponseEntity.ok("Registration successful! Please login.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred during registration. Please try again.");
+        }
     }
 
 
