@@ -10,5 +10,5 @@ public interface TransportService {
                                           int storeId,
                                           Date orderDate);
 
-    void modifyTransportStatus(String orderId);
+    void modifyTransportStatus(int fromStoreId);
 }
