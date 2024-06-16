@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -19,52 +22,58 @@ import java.util.List;
 public class TransportServiceImpl implements TransportService {
     private final StockMapper stockMapper;
     private final TransportMapper transportMapper;
+
     @Override
     public TransportVO findOptimalTransportStore(String productId,
                                                  int quantity,
                                                  int storeId,
                                                  Date orderDate) {
-        //주문한 시간으로부터 지점별 출발 배차 시간 + 운송 시간 고려해서
-        //가장 빨리 배송 받을 수 있는 지점 연결
-        LocalTime orderTime = convertToLocalTime(orderDate);
+        // 주문한 시간과 날짜를 LocalDateTime으로 변환
+        LocalDateTime orderDateTime = convertToLocalDateTime(orderDate);
         long minDifference = Long.MAX_VALUE;
         TransportSchedule optimalSchedule = null;
-        LocalTime optimalTime = null;
+        LocalDateTime optimalTime = null;
 
         // 모든 배차 시간을 순회하면서 가장 빠른 배차 시간 + 재고 조회
         // 배차시간, 운송 시간, 재고 3가지를 고려해야한다.
         List<StockVO> stockList = stockMapper.selectStockForStore(productId);
         for (StockVO stockVO : stockList) {
-            System.out.println(stockVO.getQuantity());
             if (stockVO.getStoreId() == storeId) continue;
             if (stockVO.getQuantity() < quantity) continue;
 
             for (TransportSchedule schedule : TransportSchedule.values()) {
                 if (schedule.getStoreId() != stockVO.getStoreId()) continue;
-                LocalTime scheduleTime = schedule.getDepartureTime();
-                if (scheduleTime.toSecondOfDay() - orderTime.toSecondOfDay() < 0) continue;
+
+                // 배차 시간을 LocalDateTime으로 변환
+                LocalDateTime scheduleDateTime = LocalDateTime.of(orderDateTime.toLocalDate(), schedule.getDepartureTime());
+                if (scheduleDateTime.isBefore(orderDateTime)) {
+                    // 배차 시간이 주문 시간 이전이면 다음 날로 설정
+                    scheduleDateTime = scheduleDateTime.plusDays(1);
+                }
+
                 for (TransportInformation information : TransportInformation.values()) {
                     if (information.getFromStoreId() != stockVO.getStoreId() || information.getToStoreId() != storeId) {
                         continue;
                     }
-                    // scheduleTime + 해당 지점까지의 운송 시간 계산
-                    LocalTime resultTime = scheduleTime.plusMinutes(information.getTransportMinutes());
+                    // scheduleDateTime + 해당 지점까지의 운송 시간 계산
+                    LocalDateTime resultDateTime = scheduleDateTime.plusMinutes(information.getTransportMinutes());
 
                     // 주문 시각으로 부터 가장 빠른 시간 구하기
-                    long difference = resultTime.toSecondOfDay() - orderTime.toSecondOfDay();
+                    long difference = Duration.between(orderDateTime, resultDateTime).toSeconds();
                     if (difference < minDifference) {
                         minDifference = difference;
                         optimalSchedule = schedule;
-                        optimalTime = resultTime;
+                        optimalTime = resultDateTime;
                     }
                 }
             }
         }
 
-        //주문 테이블에 픽업 예상 날짜도 배송 도착 예정 시간 + 임의로 설정한 시간으로 고려해서 만들어줘야한다.
-
-        return new TransportVO(optimalSchedule.getStoreId(), optimalSchedule.getDepartureTime(), optimalTime);
+        // 픽업 예상 날짜와 시간 설정
+        return new TransportVO(optimalSchedule.getStoreId(), optimalSchedule.getDepartureTime(), optimalTime.toLocalTime());
     }
+
+
 
     @Override
     @Transactional
@@ -72,7 +81,7 @@ public class TransportServiceImpl implements TransportService {
         transportMapper.updateStatusByOrderId(orderId);
     }
 
-    private static LocalTime convertToLocalTime(Date date) {
-        return new java.sql.Time(date.getTime()).toLocalTime();
+    private LocalDateTime convertToLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 }
