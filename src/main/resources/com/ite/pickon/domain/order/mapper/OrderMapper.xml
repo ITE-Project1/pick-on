@@ -3,5 +3,30 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="com.ite.pickon.domain.order.mapper.OrderMapper">
-	
+    <select id="selectOrderById" parameterType="string" resultType="com.ite.pickon.domain.order.dto.GetOrderRes">
+        SELECT
+            O.ORDER_ID as orderId,
+            CAST(O.CREATED_AT AS TIMESTAMP) as orderDate,
+            CAST(O.PICKUP_DATE AS TIMESTAMP) as pickupDate,
+            NVL((SELECT S.NAME
+                 FROM TRANSPORT_REQUEST TR
+                          JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
+                 WHERE TR.ORDER_ID = O.ORDER_ID), '발송X') as fromStore,
+            CASE
+                WHEN O.STATUS = 2 THEN 'PENDING'
+                WHEN O.STATUS = 0 THEN 'SHIPPED'
+                WHEN O.STATUS = 1 THEN 'PICKUPREADY'
+                WHEN O.STATUS = 3 THEN 'COMPLETED'
+                END as pickupStatus,
+            P.NAME as productName,
+            O.PRODUCT_ID as productId,
+            O.QUANTITY as quantity,
+            O.TOTAL_PRICE as totalPrice
+        FROM
+            ORDERS O
+                JOIN STORE S ON O.STORE_ID = S.STORE_ID
+                JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+        WHERE
+            O.ORDER_ID = #{orderId}
+    </select>
 </mapper>
