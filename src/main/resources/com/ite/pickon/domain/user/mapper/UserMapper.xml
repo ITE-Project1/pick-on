@@ -10,6 +10,5 @@
 
     <select id="selectUser" resultType="UserVO">
         SELECT * FROM users WHERE username = #{username}
-    </select>
-
+    </select>  
 </mapper>
