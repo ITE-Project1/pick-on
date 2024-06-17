@@ -10,7 +10,7 @@
 		JOIN product p ON stk.product_id = p.product_id
 		WHERE s.store_id = #{storeId}
 			<if test="keyword != null and keyword != ''">
-				AND (p.name LIKE '%' || #{keyword} || '%')
+				AND (LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%')
 			</if>
 		ORDER BY
 			<if test="pageable.sort != null">
@@ -26,9 +26,29 @@
 		VALUES (#{productId},#{name}, #{description}, #{price}, #{imageUrl})
 	</insert>
 
-	<select id="selectProductDetail" parameterType="String" resultType="com.ite.pickon.domain.product.dto.ProductResponse">
-		select product_id as productId, name, description, price, image_url as imageUrl
+<!-- 사업 확장을 고려했을 때 join하는 단일쿼리 방식이 상품/재고 각각의 쿼리 작성보다 효율적이다 -->
+	<select id="selectProductDetail" resultType="com.ite.pickon.domain.product.dto.ProductResponse">
+		select p.product_id as productId, p.name as name, p.description as description,
+		       p.price as price, p.image_url as imageUrl,
+		    s.store_id as storeId, s.quantity as quantity
+		from product p
+		join stock s on p.product_id = s.product_id
+		where p.product_id LIKE #{productId}
+	</select>
+
+	<select id="selectProductList" resultType="com.ite.pickon.domain.product.dto.ProductListVO">
+		select product_id, name, price, image_url
 		from product
-		where product_id LIKE #{productId}
+		<if test="keyword != null and keyword != ''">
+			where LOWER(name) LIKE '%' || LOWER(#{keyword}) || '%'
+			or LOWER(product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+		</if>
+		order by
+		<if test="pageable.sort != null">
+			<foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
+				${order.property} ${order.direction}
+			</foreach>
+		</if>
+		OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
 	</select>
 </mapper>
