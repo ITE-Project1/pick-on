@@ -1,6 +1,7 @@
 package com.ite.pickon.domain.product.mapper;
 
 import com.ite.pickon.domain.product.dto.ProductAdminVO;
+import com.ite.pickon.domain.product.dto.ProductListVO;
 import com.ite.pickon.domain.product.dto.ProductResponse;
 import com.ite.pickon.domain.product.dto.ProductVO;
 import org.apache.ibatis.annotations.Param;
@@ -14,5 +15,9 @@ public interface ProductMapper {
 
     int insertNewProduct(ProductVO productVO);
 
-    ProductResponse selectProductDetail(String productId);
+    List<ProductResponse> selectProductDetail(String productId);
+
+    List<ProductListVO> selectProductList(@Param("pageable") Pageable pageable,
+                                          @Param("keyword") String keyword);
+    //@Param: MyBatis가 메서드의 파라미터 이름을 SQL 문 내에 맵핑하기 위해 쓴다
 }

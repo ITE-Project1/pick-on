@@ -1,15 +1,16 @@
 package com.ite.pickon.domain.product.dto;
-//상품 상세
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-//상품등록
+import lombok.ToString;
+
+//상품목록 조회용 VO
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class ProductRequest {
+@ToString
+public class ProductListVO {
+    private String productId;
     private String name;
-    private String description;
     private int price;
     private String imageUrl;
 }

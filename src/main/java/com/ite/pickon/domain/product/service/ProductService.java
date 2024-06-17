@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface ProductService {
     List<ProductAdminVO> findProductList(String storeId, Pageable pageable, String keyword);
-    int insertProduct(ProductRequest productRequest);
+    int insertProduct(ProductVO productVO);
 
-    ProductResponse getDetail(String productId);
+    List<ProductResponse> getDetail(String productId);
+
+    List<ProductListVO> getList(Pageable pageable, String keyword);
 }
 
 
