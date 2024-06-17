@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+//@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -33,7 +33,7 @@ public class OrderController {
      * 주문하기
      * [POST] /orders
      */
-    @PostMapping(value="", produces = "application/json; charset=UTF-8")
+    @PostMapping(value="/orders", produces = "application/json; charset=UTF-8")
     public ResponseEntity<SimpleResponse> orderAdd(@RequestParam("userId") Long userId,
                                               @RequestBody OrderReq orderReq) {
         orderService.addOrder(userId, orderReq);
@@ -42,9 +42,9 @@ public class OrderController {
 
     /**
      * 지점별 주문 내역 조회
-     * [GET] /orders?storeId={지점인덱스}&page={페이지번호}&keyword={검색키워드}
+     * [GET] /admin/orders?storeId={지점인덱스}&page={페이지번호}&keyword={검색키워드}
      */
-    @GetMapping("")
+    @GetMapping("/admin/orders")
     public ResponseEntity<List<MultiOrderRes>> orderList(@RequestParam String storeId,
                                                                   @RequestParam int page,
                                                                   @RequestParam(required = false) String keyword) {
@@ -55,9 +55,9 @@ public class OrderController {
 
     /**
      *  주문 상세조회
-     *  [GET] /orders/:{orderId}
+     *  [GET] /admin/orders/:{orderId}
      */
-    @GetMapping("/{orderId}")
+    @GetMapping("/admin/orders/{orderId}")
     public ResponseEntity<OrderRes> orderDetails(@PathVariable String orderId) {
         OrderRes orderRes = orderService.findOrderDetail(orderId);
         return new ResponseEntity<>(orderRes, HttpStatus.OK);
@@ -65,9 +65,9 @@ public class OrderController {
 
     /**
      *  고객 픽업 완료
-     *  [PATCH] /orders/:{orderId}/status/completed
+     *  [PATCH] /admin/orders/:{orderId}/status/completed
      */
-    @PatchMapping(value = "/{orderId}/status/completed", produces = "application/json; charset=UTF-8")
+    @PatchMapping(value = "/admin/orders/{orderId}/status/completed", produces = "application/json; charset=UTF-8")
     public ResponseEntity<SimpleResponse> orderCompletedModify(@PathVariable String orderId) {
         orderService.modifyOrderStatus(orderId, OrderStatus.COMPLETED);
         return new ResponseEntity<>(new SimpleResponse("고객 픽업이 완료되었습니다."), HttpStatus.OK);
