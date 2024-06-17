@@ -6,7 +6,9 @@ import com.ite.pickon.domain.order.dto.OrderRes;
 import com.ite.pickon.domain.order.dto.OrderReq;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
 import com.ite.pickon.domain.stock.service.StockService;
+import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.domain.transport.dto.TransportVO;
+import com.ite.pickon.domain.transport.mapper.TransportMapper;
 import com.ite.pickon.domain.transport.service.TransportService;
 import com.ite.pickon.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import static com.ite.pickon.exception.ErrorCode.FIND_FAIL_ORDER_ID;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderMapper orderMapper;
+    private final TransportMapper transportMapper;
     private final TransportService transportService;
     private final StockService stockService;
 
@@ -66,13 +69,17 @@ public class OrderServiceImpl implements OrderService {
     // 주문 생성
     private void processOrder(Long userId, OrderReq orderReq, TransportVO transportVO) {
         LocalDateTime pickupDate;
+        int status;
         if (orderReq.getDirectPickup() == 1) {
             // 바로 픽업 가능한 경우
             pickupDate = LocalDateTime.now();
+            status = OrderStatus.PICKUPREADY.getStatusCode();
         } else {
             // 지점 간 상품 운송 필요한 경우
             pickupDate = transportVO.getArrivalTime();
+            status = OrderStatus.PENDING.getStatusCode();
         }
+        orderReq.setStatus(status);
         orderMapper.insertOrder(userId, orderReq, pickupDate);
     }
 
@@ -111,6 +118,19 @@ public class OrderServiceImpl implements OrderService {
         if (updatedRows == 0) {
             throw new CustomException(FIND_FAIL_ORDER_ID);
         }
+    }
+
+    // 지점 간 배송 완료
+    @Override
+    @Transactional
+    public void modifyOrderAndTransportStatus(List<String> orderIds, OrderStatus orderStatus, TransportStatus transportStatus) {
+//        for (String orderId : orderIds) {
+//            orderMapper.updateOrderStatus(orderId, orderStatus.getStatusCode());
+//            transportMapper.updateTransportRequestStatus(orderId, transportStatus.getStatusCode());
+//        }
+
+        orderMapper.batchUpdateOrderStatus(orderIds, orderStatus.getStatusCode());
+        transportMapper.batchUpdateTransportRequestStatus(orderIds, transportStatus.getStatusCode());
     }
 
 }
