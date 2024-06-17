@@ -1,5 +1,6 @@
 package com.ite.pickon.domain.user.controller;
 
+import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.domain.user.service.UserServiceImpl;
@@ -21,18 +22,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/register")
-    public String register() {
-        return "register";
-    }
-
     @PostMapping("/register")
-    public ResponseEntity<?> userAdd(@RequestBody UserVO user, BindingResult result) {
-
+    public ResponseEntity<?> userAdd(@RequestBody UserVO user) {
         try {
             // 사용자 등록
             user.setRole("general");
-            System.out.println(user);
+            user.setStatus(UserStatus.ACTIVE);
             userService.addUser(user);
             return ResponseEntity.ok("Registration successful! Please login.");
         } catch (Exception e) {
@@ -40,22 +35,4 @@ public class UserController {
         }
     }
 
-    @GetMapping("/customLogin")
-    public void loginInput(String error, String logout, Model model) {
-        log.info("error : " + error);
-        log.info("logout : " + logout);
-
-        if (error != null) {
-            model.addAttribute("error", "Login Error Check Your Account");
-        }
-
-        if (logout != null) {
-            model.addAttribute("logout", "Logout!!!");
-        }
-    }
-
-    @GetMapping("/customLogout")
-    public void logoutGET() {
-        log.info("custom logout");
-    }
 }
