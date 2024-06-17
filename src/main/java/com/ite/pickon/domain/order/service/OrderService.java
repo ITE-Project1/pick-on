@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface OrderService {
 
-    void createOrder(Long userId, OrderReq orderReq);
+    void addOrder(Long userId, OrderReq orderReq);
 
-    OrderRes getOrderById(String orderId);
+    OrderRes findOrderDetail(String orderId);
 
-    void updateOrderStatus(String orderId, OrderStatus completed);
+    void modifyOrderStatus(String orderId, OrderStatus completed);
 
-    List<MultiOrderRes> getOrdersByStoreId(String storeId, int page, int PAGE_SIZE, String keyword);
+    List<MultiOrderRes> findOrderList(String storeId, int page, int PAGE_SIZE, String keyword);
 }
