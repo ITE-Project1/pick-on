@@ -10,6 +10,7 @@ import com.ite.pickon.response.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +44,7 @@ public class OrderController {
      * 지점별 주문 내역 조회
      * [GET] /admin/orders?storeId={지점인덱스}&page={페이지번호}&keyword={검색키워드}
      */
+//    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/admin/orders")
     public ResponseEntity<List<MultiOrderRes>> orderList(@RequestParam String storeId,
                                                                   @RequestParam int page,
@@ -56,6 +58,7 @@ public class OrderController {
      *  주문 상세조회
      *  [GET] /admin/orders/:{orderId}
      */
+//    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/admin/orders/{orderId}")
     public ResponseEntity<OrderRes> orderDetails(@PathVariable String orderId) {
         OrderRes orderRes = orderService.findOrderDetail(orderId);
@@ -66,6 +69,7 @@ public class OrderController {
      *  고객 픽업 완료
      *  [PATCH] /admin/orders/:{orderId}/status/completed
      */
+//    @CrossOrigin(origins = "http://localhost:3000")
     @PatchMapping(value = "/admin/orders/{orderId}/status/completed", produces = "application/json; charset=UTF-8")
     public ResponseEntity<SimpleResponse> orderCompletedModify(@PathVariable String orderId) {
         orderService.modifyOrderStatus(orderId, OrderStatus.COMPLETED);
@@ -76,6 +80,7 @@ public class OrderController {
      *  지점간 상품 운송 완료
      *  [PATCH] /admin/orders/status/pickupready
      */
+//    @CrossOrigin(origins = "http://localhost:3000")
     @PatchMapping("/admin/orders/status/pickupready")
     public ResponseEntity<SimpleResponse> updateOrderStatusToPickupReady(@RequestBody List<String> orderIds) {
         orderService.modifyOrderAndTransportStatus(orderIds, OrderStatus.PICKUPREADY, TransportStatus.COMPLETED);

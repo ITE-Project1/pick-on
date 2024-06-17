@@ -69,6 +69,7 @@
                 WHEN O.STATUS = 1 THEN '픽업가능'
                 WHEN O.STATUS = 3 THEN '픽업완료'
                 END as pickupStatus,
+            P.IMAGE_URL as prodcutImg,
             P.NAME as productName,
             O.PRODUCT_ID as productId,
             O.QUANTITY as quantity,

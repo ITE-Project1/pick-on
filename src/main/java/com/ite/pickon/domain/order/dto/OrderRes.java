@@ -18,6 +18,7 @@ public class OrderRes {
     private Date pickupDate;
     private String fromStore;
     private String pickupStatus;
+    private String prodcutImg;
     private String productName;
     private String productId;
     private int quantity;
