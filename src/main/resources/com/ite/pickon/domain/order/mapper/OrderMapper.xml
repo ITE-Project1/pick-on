@@ -47,7 +47,7 @@
             JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
         WHERE O.STORE_ID = #{storeId}
         <if test="keyword != null and keyword != ''">
-            AND (O.ORDER_ID LIKE '%' || #{keyword} || '%')
+            AND (LOWER(O.ORDER_ID) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
         ORDER BY O.STATUS DESC, O.ORDER_ID ASC
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
