@@ -18,5 +18,4 @@ public class UserVO {
     private String role;
     private UserStatus status;
     private Date created_at;
-
 }

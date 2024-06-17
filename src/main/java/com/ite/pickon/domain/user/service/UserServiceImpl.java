@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
@@ -30,20 +30,4 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userMapper.selectUser(username);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserVO user = userMapper.selectUser(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        if ("admin".equals(user.getRole())) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        } else if ("general".equals(user.getRole())) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_GENERAL"));
-        }
-
-        return new User(user.getUsername(), user.getPassword(), authorities);
-    }
 }
