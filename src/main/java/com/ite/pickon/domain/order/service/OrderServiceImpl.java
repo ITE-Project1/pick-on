@@ -124,10 +124,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void modifyOrderAndTransportStatus(List<String> orderIds, OrderStatus orderStatus, TransportStatus transportStatus) {
-//        for (String orderId : orderIds) {
-//            orderMapper.updateOrderStatus(orderId, orderStatus.getStatusCode());
-//            transportMapper.updateTransportRequestStatus(orderId, transportStatus.getStatusCode());
-//        }
 
         orderMapper.batchUpdateOrderStatus(orderIds, orderStatus.getStatusCode());
         transportMapper.batchUpdateTransportRequestStatus(orderIds, transportStatus.getStatusCode());
