@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
 
     // 지점별 상품 목록 조회 (관리자)
-    @GetMapping("/admin")
+    @GetMapping("/admin/products")
     public ResponseEntity<List<ProductAdminVO>> getProductList(@RequestParam String storeId,
                                                                @RequestParam int page,
                                                                @RequestParam String sort,
@@ -38,7 +37,7 @@ public class ProductController {
         return new ResponseEntity<>(productService.findProductList(storeId, pageable, keyword), HttpStatus.OK);
     }
 //상품등록
-    @PostMapping("/register")
+    @PostMapping("/products/register")
     public ResponseEntity<SimpleResponse> createProduct(@RequestBody ProductVO productVO){
         if (productService.insertProduct(productVO)==1){
             return new ResponseEntity<>(new SimpleResponse("상품 등록이 완료되었습니다."), HttpStatus.OK);
@@ -47,9 +46,8 @@ public class ProductController {
         return null;
     }
 //상품 상세조회
-    @GetMapping("/detail/{productId}")
+    @GetMapping("/products/detail/{productId}")
     public ResponseEntity<List<ProductResponse>> getProductDetail(@PathVariable String productId){
-
         //ResponseEntity는 HTTP 응답을 나타내는 클래스로서, 클라이언트에게 반환할 데이터와 HTTP 상태 코드를 포함
         List<ProductResponse> response = productService.getDetail(productId);
         // ProductResponse 객체 로깅
@@ -59,7 +57,8 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
         //return new ResponseEntity<>(productService.getDetail(productId),HttpStatus.OK);
     }
-    @GetMapping ("/list")
+  
+    @GetMapping ("/products/list")
     public ResponseEntity<List<ProductListVO>> getBasicProductList(@RequestParam int page,
                                                                    @RequestParam String sort,
                                                                    @RequestParam(required = false)String keyword){

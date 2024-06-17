@@ -8,4 +8,27 @@
         FROM stock
         WHERE product_id LIKE #{productId}
     </select>
+
+    <!-- 재고 수량 업데이트 -->
+    <update id="updateStockQuantity">
+        UPDATE STOCK
+        SET QUANTITY = QUANTITY + #{quantityChange}
+        WHERE STORE_ID = #{storeId} AND PRODUCT_ID = #{productId}
+    </update>
+
+    <!-- 재고 생성 -->
+    <insert id="insertStock">
+        INSERT INTO STOCK (STORE_ID, PRODUCT_ID, QUANTITY)
+        VALUES (#{stockReq.storeId},
+                #{stockReq.productId},
+                #{stockReq.quantity})
+    </insert>
+
+    <!-- 해당 지점에 상품 존재 여부 확인 -->
+    <select id="checkStockExists" resultType="int">
+        SELECT COUNT(*)
+        FROM STOCK
+        WHERE STORE_ID = #{storeId}
+          AND PRODUCT_ID = #{productId}
+    </select>
 </mapper>
