@@ -9,4 +9,11 @@
         FROM stock
         WHERE product_id LIKE #{productId}
     </select>
+
+    <!-- 재고 수량 업데이트 -->
+    <update id="updateStockQuantity">
+        UPDATE STOCK
+        SET QUANTITY = QUANTITY + #{quantityChange}
+        WHERE STORE_ID = #{storeId} AND PRODUCT_ID = #{productId}
+    </update>
 </mapper>

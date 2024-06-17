@@ -12,10 +12,20 @@
                 #{userId},
                 #{orderReq.storeId},
                 #{orderReq.productId},
-                CURRENT_TIMESTAMP,
+                #{pickupDate},
                 #{orderReq.quantity},
                 (SELECT PRICE FROM PRODUCT WHERE PRODUCT_ID = #{orderReq.productId}) * #{orderReq.quantity},
                 1)
+    </insert>
+
+    <!-- 운송 요청 생성 -->
+    <insert id="insertTransportRequest">
+        INSERT INTO TRANSPORT_REQUEST (TRANSPORT_REQUEST_ID, FROM_STORE_ID, TO_STORE_ID, ORDER_ID)
+        VALUES (
+                   transport_request_seq.NEXTVAL,
+                   #{fromStoreId},
+                   #{orderReq.storeId},
+                   #{orderReq.orderId})
     </insert>
 
     <!-- 주문 목록 조회 -->

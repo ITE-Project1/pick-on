@@ -6,6 +6,7 @@ import com.ite.pickon.domain.transport.TransportInformation;
 import com.ite.pickon.domain.transport.TransportSchedule;
 import com.ite.pickon.domain.transport.dto.TransportVO;
 import com.ite.pickon.domain.transport.mapper.TransportMapper;
+import com.ite.pickon.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
+import static com.ite.pickon.exception.ErrorCode.FAIL_ORDER_BY_QUANTITY;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +34,8 @@ public class TransportServiceImpl implements TransportService {
         LocalDateTime orderDateTime = convertToLocalDateTime(orderDate);
         long minDifference = Long.MAX_VALUE;
         TransportSchedule optimalSchedule = null;
-        LocalDateTime optimalTime = null;
+        LocalDateTime optimalDepartureDateTime = null;
+        LocalDateTime optimalArrivalDateTime = null;
 
         // 모든 배차 시간을 순회하면서 가장 빠른 배차 시간 + 재고 조회
         // 배차시간, 운송 시간, 재고 3가지를 고려해야한다.
@@ -62,14 +66,19 @@ public class TransportServiceImpl implements TransportService {
                     if (difference < minDifference) {
                         minDifference = difference;
                         optimalSchedule = schedule;
-                        optimalTime = resultDateTime;
+                        optimalArrivalDateTime = resultDateTime;
+                        optimalDepartureDateTime = scheduleDateTime;
                     }
                 }
             }
         }
 
+        if (optimalSchedule == null) {
+            throw new CustomException(FAIL_ORDER_BY_QUANTITY);
+        }
+
         // 픽업 예상 날짜와 시간 설정
-        return new TransportVO(optimalSchedule.getStoreId(), optimalSchedule.getDepartureTime(), optimalTime.toLocalTime());
+        return new TransportVO(optimalSchedule.getStoreId(), optimalDepartureDateTime, optimalArrivalDateTime);
     }
 
     @Override

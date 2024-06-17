@@ -15,6 +15,6 @@ public class OrderReq {
     private String orderId;
     private String productId;
     private int quantity;
-    private Long storeId;
+    private int storeId;
     private int directPickup;
 }
