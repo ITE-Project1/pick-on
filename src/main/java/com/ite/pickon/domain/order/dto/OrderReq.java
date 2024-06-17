@@ -17,4 +17,5 @@ public class OrderReq {
     private int quantity;
     private int storeId;
     private int directPickup;
+    private int status;
 }

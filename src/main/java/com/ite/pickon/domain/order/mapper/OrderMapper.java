@@ -28,6 +28,9 @@ public interface OrderMapper {
     OrderRes selectOrderById(@Param("orderId") String orderId);
 
     // 주문 상태 변경
-    int updateOrderStatus(@Param("orderId") String orderId, @Param("status") int status);
+    int updateOrderStatus(@Param("orderId") String orderId, @Param("statusCode") int statusCode);
+
+    // 주문 상태 일괄 변경
+    void batchUpdateOrderStatus(@Param("orderIds") List<String> orderIds, @Param("statusCode") int statusCode);
 
 }
