@@ -3,7 +3,6 @@ package com.ite.pickon.domain.product.controller;
 import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.product.dto.ProductRequest;
 import com.ite.pickon.domain.product.dto.ProductResponse;
-import com.ite.pickon.domain.product.dto.ProductVO;
 import com.ite.pickon.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -16,13 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
 
     // 지점별 상품 목록 조회 (관리자)
-    @GetMapping("/admin")
+    @GetMapping("/admin/products")
     public ResponseEntity<List<ProductAdminVO>> getProductList(@RequestParam String storeId,
                                                                @RequestParam int page,
                                                                @RequestParam String sort,
@@ -40,7 +38,7 @@ public class ProductController {
         return new ResponseEntity<>(productService.findProductList(storeId, pageable, keyword), HttpStatus.OK);
     }
 //상품등록
-    @PostMapping("/register")
+    @PostMapping("/products/register")
     public void createProduct(@RequestBody ProductRequest productRequest){
         if (productService.insertProduct(productRequest)==1){
             System.out.println("insert success"); // 이렇게 처리해도 되나?
@@ -48,7 +46,7 @@ public class ProductController {
         //service단에서 throws 하기
     }
 //상품 상세조회
-    @GetMapping("/detail/{productId}")
+    @GetMapping("/products/detail/{productId}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable String productId){
         System.out.println("====================");
         //return new ResponseEntity<>(productService.getDetail(productId),HttpStatus.OK);
