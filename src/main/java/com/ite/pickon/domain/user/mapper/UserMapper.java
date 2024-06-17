@@ -6,5 +6,5 @@ public interface UserMapper {
 
     void insertUser(UserVO user);
     UserVO selectUser(String username);
-
+    void deleteUser(String username);
 }

@@ -6,4 +6,6 @@ public interface UserService {
 
     void addUser(UserVO user);
     UserVO findByUsername(String username);
+
+    void removeUser(String username);
 }

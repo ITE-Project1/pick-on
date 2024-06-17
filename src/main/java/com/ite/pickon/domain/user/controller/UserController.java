@@ -5,6 +5,7 @@ import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserVO user, HttpSession session) {
+    public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session) {
         String password = userService.findByUsername(user.getUsername()).getPassword();
         if (password.equals(user.getPassword())) {
             session.setAttribute("user", user);
@@ -44,9 +45,20 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
+    public ResponseEntity<?> userLogout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
     }
 
+    @PatchMapping("/sign-out")
+    public ResponseEntity<?> userRemove(@RequestBody UserVO user, HttpSession session) {
+        //UserVO user = (UserVO) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        System.out.println(user.getUsername());
+        userService.removeUser(user.getUsername());
+        session.invalidate();
+        return ResponseEntity.ok("User deactivated");
+    }
 }
