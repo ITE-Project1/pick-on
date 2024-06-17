@@ -10,5 +10,8 @@
 
     <select id="selectUser" resultType="UserVO">
         SELECT * FROM users WHERE username = #{username}
-    </select>  
+    </select>
+    <update id="deleteUser">
+        UPDATE users SET status = 1 WHERE username = #{username}
+    </update>
 </mapper>
