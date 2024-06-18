@@ -13,4 +13,5 @@ public interface UserMapper {
     UserVO selectUser(String username);
     void deleteUser(String username);
     List<UserVO> selectUserListByKeyword(@Param("pageable")Pageable pageable, @Param("keyword")String keyword);
+    void updateUserStatus(@Param("username")String username, @Param("statusCode")int statusCode);
 }

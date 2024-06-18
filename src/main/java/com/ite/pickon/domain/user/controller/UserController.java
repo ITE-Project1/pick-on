@@ -1,9 +1,11 @@
 package com.ite.pickon.domain.user.controller;
 
+import com.ite.pickon.domain.order.OrderStatus;
 import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
+import com.ite.pickon.response.SimpleResponse;
 import com.ite.pickon.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -87,7 +89,6 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        System.out.println(user.getUsername());
         userService.removeUser(user.getUsername());
         session.invalidate();
         return ResponseEntity.ok("User deactivated");
@@ -98,6 +99,12 @@ public class UserController {
                                                     @RequestParam(required = false) String keyword) {
         Pageable pageable = PageRequest.of(page, 10);
         return new ResponseEntity<>(userService.findUserList(pageable, keyword), HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/admin/users", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> userStatusModify(@RequestParam String username) {
+        userService.modifyUserStatus(username, UserStatus.BLACK);
+        return ResponseEntity.ok("User blacked");
     }
 
     private Map<String, String> createErrorMap(BindingResult bindingResult) {
