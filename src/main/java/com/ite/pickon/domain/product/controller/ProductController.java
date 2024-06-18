@@ -46,20 +46,14 @@ public class ProductController {
             return ResponseEntity.ok(new SimpleResponse("상품 등록이 완료되었습니다."));
         }
 
-        //service단에서 throws 하기
         return null;
     }
 
     //상품 상세조회
     @GetMapping("/products/detail/{productId}")
     public ResponseEntity<List<ProductResponse>> getProductDetail(@PathVariable String productId) {
-        //ResponseEntity는 HTTP 응답을 나타내는 클래스로서, 클라이언트에게 반환할 데이터와 HTTP 상태 코드를 포함
         List<ProductResponse> response = productService.getDetail(productId);
-        // ProductResponse 객체 로깅
-
-        // ResponseEntity 생성 후 반환
         return new ResponseEntity<>(response, HttpStatus.OK);
-        //return new ResponseEntity<>(productService.getDetail(productId),HttpStatus.OK);
     }
 
     @GetMapping("/products/list")
@@ -75,7 +69,7 @@ public class ProductController {
             sortOrder = Sort.by("price").ascending();
         }
         page = page - 1;
-        Pageable pageable = PageRequest.of(page, 10, sortOrder); //페이지 번호(page)를 기준으로 한 페이지에 10개의 항목을 포함하며, sortOrder에 지정된 정렬 순서대로 데이터를 가져오는 PageRequest 객체
+        Pageable pageable = PageRequest.of(page, 10, sortOrder);
         List<ProductListVO> response = productService.getList(pageable, keyword);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
