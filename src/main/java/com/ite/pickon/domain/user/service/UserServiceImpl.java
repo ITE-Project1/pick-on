@@ -1,9 +1,11 @@
 package com.ite.pickon.domain.user.service;
 
 
+import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,5 +36,11 @@ public class UserServiceImpl implements UserService {
     public void removeUser(String username) {
         userMapper.deleteUser(username);
     }
+
+    @Override
+    public List<UserVO> findUserList(Pageable pageable, String keyword) {
+        return userMapper.selectUserListByKeyword(pageable, keyword);
+    }
+
 
 }
