@@ -1,31 +1,26 @@
 package com.ite.pickon.domain.user.controller;
 
-import com.ite.pickon.domain.order.OrderStatus;
-import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
-import com.ite.pickon.response.SimpleResponse;
 import com.ite.pickon.validator.UserValidator;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpSession;
 
 @Log
 @Controller
@@ -100,7 +95,6 @@ public class UserController {
                                                          @RequestParam(required = false) String keyword) {
         Pageable pageable = PageRequest.of(page, 10);
         List<UserAdminVO> userList = userService.findUserList(pageable, keyword);
-        System.out.println("---" + userList.size());
         return ResponseEntity.ok(userList);
     }
 
