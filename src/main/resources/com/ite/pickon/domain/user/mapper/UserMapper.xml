@@ -18,6 +18,7 @@
     <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserVO">
         SELECT username, password, created_at
         FROM users
+        WHERE role NOT LIKE 'admin'
         <if test="keyword != null and keyword != ''">
             AND (LOWER(username) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
