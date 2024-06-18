@@ -89,7 +89,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        userService.removeUser(user.getUsername());
+        userService.modifyUserStatus(user.getUsername(), UserStatus.INACTIVE);
         session.invalidate();
         return ResponseEntity.ok("User deactivated");
     }
