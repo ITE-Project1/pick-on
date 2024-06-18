@@ -33,4 +33,13 @@
         SET STATUS = #{statusCode}
         WHERE USERNAME = #{username}
     </update>
+
+    <update id="updateUserListStatus">
+        UPDATE users
+        SET status = #{statusCode}
+        WHERE username IN
+        <foreach item="username" index="index" collection="usernames" open="(" separator="," close=")">
+            #{username}
+        </foreach>
+    </update>
 </mapper>

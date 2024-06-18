@@ -46,5 +46,10 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserStatus(username, userStatus.getStatusCode());
     }
 
+    @Override
+    public void modifyUserListStatus(List<String> usernames, UserStatus userStatus) {
+        userMapper.updateUserListStatus(usernames, userStatus.getStatusCode());
+    }
+
 
 }
