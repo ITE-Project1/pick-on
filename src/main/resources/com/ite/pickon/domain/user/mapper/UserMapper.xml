@@ -19,7 +19,7 @@
     </select>
 
     <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserAdminVO">
-        SELECT username, created_at as createdAt, status
+        SELECT username, created_at, status
         FROM users
         WHERE role NOT LIKE 'admin'
         <if test="keyword != null and keyword != ''">

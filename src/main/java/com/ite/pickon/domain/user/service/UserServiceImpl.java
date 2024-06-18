@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -33,7 +33,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserAdminVO> findUserList(Pageable pageable, String keyword) {
-        System.out.println("-------");
         List<UserAdminVO> userAdminVOList = userMapper.selectUserListByKeyword(pageable, keyword);
         if (userAdminVOList == null) {
             throw new CustomException(ErrorCode.FIND_FAIL_USER_ID);
