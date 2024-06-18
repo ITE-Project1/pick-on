@@ -1,54 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.ite.pickon.domain.product.mapper.ProductMapper">
-	<select id="selectProductListByStore" parameterType="hashmap" resultType="com.ite.pickon.domain.product.dto.ProductAdminVO">
-		SELECT p.product_id, p.name, p.price, p.image_url, p.created_at, stk.quantity
-		FROM store s
-		JOIN stock stk ON s.store_id = stk.store_id
-		JOIN product p ON stk.product_id = p.product_id
-		WHERE s.store_id = #{storeId}
-			<if test="keyword != null and keyword != ''">
-				AND (LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%')
-			</if>
-		ORDER BY
-			<if test="pageable.sort != null">
-				<foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
-					${order.property} ${order.direction}
-				</foreach>
-			</if>
-		OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
-	</select>
+    <select id="selectProductListByStore" parameterType="hashmap"
+            resultType="com.ite.pickon.domain.product.dto.ProductAdminVO">
+        SELECT p.product_id, p.name, p.price, p.image_url, p.created_at, stk.quantity
+        FROM store s
+        JOIN stock stk ON s.store_id = stk.store_id
+        JOIN product p ON stk.product_id = p.product_id
+        WHERE s.store_id = #{storeId}
+        <if test="keyword != null and keyword != ''">
+            AND (LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%')
+        </if>
+        ORDER BY
+        <if test="pageable.sort != null">
+            <foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
+                ${order.property} ${order.direction}
+            </foreach>
+        </if>
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
 
-	<insert id="insertNewProduct" parameterType="com.ite.pickon.domain.product.dto.ProductVO">
-		insert into product(product_id, name, description, price, image_url)
-		VALUES (#{productId},#{name}, #{description}, #{price}, #{imageUrl})
-	</insert>
+    <insert id="insertNewProduct" parameterType="com.ite.pickon.domain.product.dto.ProductVO">
+        insert into product(product_id, brand_id, name, description, price, image_url)
+        VALUES (#{productId}, #{brandId}, #{name}, #{description}, #{price}, #{imageUrl})
+    </insert>
 
-<!-- 사업 확장을 고려했을 때 join하는 단일쿼리 방식이 상품/재고 각각의 쿼리 작성보다 효율적이다 -->
-	<select id="selectProductDetail" resultType="com.ite.pickon.domain.product.dto.ProductResponse">
-		select p.product_id as productId, p.name as name, p.description as description,
-		       p.price as price, p.image_url as imageUrl,
-		    s.store_id as storeId, s.quantity as quantity
-		from product p
-		join stock s on p.product_id = s.product_id
-		where p.product_id LIKE #{productId}
-	</select>
+    <!-- 사업 확장을 고려했을 때 join하는 단일쿼리 방식이 상품/재고 각각의 쿼리 작성보다 효율적이다 -->
+    <select id="selectProductDetail" resultType="com.ite.pickon.domain.product.dto.ProductResponse">
+        select p.product_id  as productId,
+               p.name        as name,
+               p.description as description,
+               p.price       as price,
+               p.image_url   as imageUrl,
+               s.store_id    as storeId,
+               s.quantity    as quantity
+        from product p
+                 join stock s on p.product_id = s.product_id
+        where p.product_id LIKE #{productId}
+    </select>
 
-	<select id="selectProductList" resultType="com.ite.pickon.domain.product.dto.ProductListVO">
-		select product_id, name, price, image_url
-		from product
-		<if test="keyword != null and keyword != ''">
-			where LOWER(name) LIKE '%' || LOWER(#{keyword}) || '%'
-			or LOWER(product_id) LIKE '%' || LOWER(#{keyword}) || '%'
-		</if>
-		order by
-		<if test="pageable.sort != null">
-			<foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
-				${order.property} ${order.direction}
-			</foreach>
-		</if>
-		OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
-	</select>
+    <select id="selectProductList" resultType="com.ite.pickon.domain.product.dto.ProductListVO">
+        select product_id, name, price, image_url
+        from product
+        <if test="keyword != null and keyword != ''">
+            where LOWER(name) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+        </if>
+        order by
+        <if test="pageable.sort != null">
+            <foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
+                ${order.property} ${order.direction}
+            </foreach>
+        </if>
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <select id="selectBrandInitialByBrandId" resultType="String">
+        select brand_initial
+        from brand
+        where brand_id = #{brandId}
+    </select>
 </mapper>

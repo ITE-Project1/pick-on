@@ -19,5 +19,6 @@ public interface ProductMapper {
 
     List<ProductListVO> selectProductList(@Param("pageable") Pageable pageable,
                                           @Param("keyword") String keyword);
-    //@Param: MyBatis가 메서드의 파라미터 이름을 SQL 문 내에 맵핑하기 위해 쓴다
+
+    String selectBrandInitialByBrandId(int brandId);
 }
