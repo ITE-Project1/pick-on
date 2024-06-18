@@ -41,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 최적의 운송 스케줄 가져오기
         TransportVO transportVO = null;
+        int stockUpdateStore = orderReq.getStoreId();
         if (orderReq.getDirectPickup() == 0) {
             transportVO = transportService.findOptimalTransportStore(
                     orderReq.getProductId(),
@@ -53,10 +54,14 @@ public class OrderServiceImpl implements OrderService {
         // 주문 생성
         processOrder(userId, orderReq, transportVO);
 
-        // 운송 요청 생성 및 재고 조정
+        // 운송 요청 생성
         if (transportVO != null) {
-            createTransportRequest(orderReq, transportVO);
+            addTransportRequest(orderReq, transportVO);
+            stockUpdateStore = transportVO.getFromStoreId();
         }
+
+        // 재고 조정
+        stockService.updateStock(stockUpdateStore, orderReq.getProductId(), -orderReq.getQuantity());
     }
 
     // 주문코드 생성
@@ -83,12 +88,9 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.insertOrder(userId, orderReq, pickupDate);
     }
 
-    // 운송 요청 생성 및 재고 조정
-    private void createTransportRequest(OrderReq orderReq, TransportVO transportVO) {
+    // 운송 요청 생성
+    private void addTransportRequest(OrderReq orderReq, TransportVO transportVO) {
         orderMapper.insertTransportRequest(orderReq, transportVO.getFromStoreId());
-
-        // 재고 조정
-        stockService.updateStock(transportVO.getFromStoreId(), orderReq.getProductId(), -orderReq.getQuantity());
     }
 
     // 주문 목록 조회
