@@ -25,4 +25,10 @@
 
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
     </select>
+    <update id="updateUserStatus">
+        UPDATE users
+        SET status = #{statusCode}
+        WHERE username = #{username}
+    </update>
+
 </mapper>
