@@ -35,7 +35,7 @@
             NVL((SELECT S.NAME
                 FROM TRANSPORT_REQUEST TR
                 JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
-                WHERE TR.ORDER_ID = O.ORDER_ID), '발송X') as fromStore,
+                WHERE TR.ORDER_ID = O.ORDER_ID), '-') as fromStore,
             CASE
                 WHEN O.STATUS = 2 THEN '대기'
                 WHEN O.STATUS = 0 THEN '배송중'
@@ -62,7 +62,7 @@
             NVL((SELECT S.NAME
                  FROM TRANSPORT_REQUEST TR
                           JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
-                 WHERE TR.ORDER_ID = O.ORDER_ID), '발송X') as fromStore,
+                 WHERE TR.ORDER_ID = O.ORDER_ID), '-') as fromStore,
             CASE
                 WHEN O.STATUS = 2 THEN '대기'
                 WHEN O.STATUS = 0 THEN '배송중'
