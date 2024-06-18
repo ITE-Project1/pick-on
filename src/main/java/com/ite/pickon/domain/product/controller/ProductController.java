@@ -23,7 +23,7 @@ public class ProductController {
     @GetMapping("/admin/products")
     public ResponseEntity<List<ProductAdminVO>> getProductList(@RequestParam String storeId,
                                                                @RequestParam int page,
-                                                               @RequestParam String sort,
+                                                               @RequestParam(required = false) String sort,
                                                                @RequestParam(required = false) String keyword) {
 
         Sort sortOrder = Sort.by("created_at").descending();
