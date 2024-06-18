@@ -11,9 +11,6 @@
     <select id="selectUser" resultType="UserVO">
         SELECT * FROM users WHERE username = #{username}
     </select>
-    <update id="deleteUser">
-        UPDATE users SET status = 1 WHERE username = #{username}
-    </update>
 
     <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserVO">
         SELECT username, password, created_at

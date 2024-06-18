@@ -39,11 +39,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeUser(String username) {
-        userMapper.deleteUser(username);
-    }
-
-    @Override
     public List<UserVO> findUserList(Pageable pageable, String keyword) {
         return userMapper.selectUserListByKeyword(pageable, keyword);
     }

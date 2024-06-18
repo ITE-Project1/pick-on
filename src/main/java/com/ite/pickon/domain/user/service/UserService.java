@@ -10,8 +10,6 @@ public interface UserService {
 
     void addUser(UserVO user);
     UserVO findByUsername(String username);
-    void removeUser(String username);
     List<UserVO> findUserList(Pageable pageable, String keyword);
-
     void modifyUserStatus(String username, UserStatus userStatus);
 }
