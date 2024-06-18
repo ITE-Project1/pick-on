@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void modifyUserListStatus(List<String> usernames, UserStatus userStatus) {
         userMapper.updateUserListStatus(usernames, userStatus.getStatusCode());
     }
