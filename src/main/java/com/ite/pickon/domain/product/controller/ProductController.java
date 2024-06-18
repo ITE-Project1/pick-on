@@ -1,13 +1,15 @@
 package com.ite.pickon.domain.product.controller;
 
-import com.ite.pickon.domain.product.dto.*;
+import com.ite.pickon.domain.product.dto.ProductAdminVO;
+import com.ite.pickon.domain.product.dto.ProductListVO;
+import com.ite.pickon.domain.product.dto.ProductRequest;
+import com.ite.pickon.domain.product.dto.ProductResponse;
 import com.ite.pickon.domain.product.service.ProductService;
 import com.ite.pickon.response.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,8 +54,7 @@ public class ProductController {
     //상품 상세조회
     @GetMapping("/products/detail/{productId}")
     public ResponseEntity<List<ProductResponse>> getProductDetail(@PathVariable String productId) {
-        List<ProductResponse> response = productService.getDetail(productId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(productService.getDetail(productId));
     }
 
     @GetMapping("/products/list")
@@ -70,8 +71,7 @@ public class ProductController {
         }
         page = page - 1;
         Pageable pageable = PageRequest.of(page, 10, sortOrder);
-        List<ProductListVO> response = productService.getList(pageable, keyword);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(productService.getList(pageable, keyword));
     }
 
 }
