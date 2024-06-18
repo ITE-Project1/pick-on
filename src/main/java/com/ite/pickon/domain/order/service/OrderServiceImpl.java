@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 운송 요청 생성 및 재고 조정
         if (transportVO != null) {
-            createTransportRequest(orderReq, transportVO);
+            addTransportRequest(orderReq, transportVO);
         }
     }
 
@@ -84,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 운송 요청 생성 및 재고 조정
-    private void createTransportRequest(OrderReq orderReq, TransportVO transportVO) {
+    private void addTransportRequest(OrderReq orderReq, TransportVO transportVO) {
         orderMapper.insertTransportRequest(orderReq, transportVO.getFromStoreId());
 
         // 재고 조정
