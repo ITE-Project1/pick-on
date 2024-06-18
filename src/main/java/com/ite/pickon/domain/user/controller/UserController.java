@@ -1,5 +1,6 @@
 package com.ite.pickon.domain.user.controller;
 
+import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
@@ -7,6 +8,9 @@ import com.ite.pickon.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -15,13 +19,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 @Log
 @Controller
-@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -35,7 +39,7 @@ public class UserController {
         this.validator = new UserValidator();
     }
 
-    @PostMapping("/register")
+    @PostMapping("/user/register")
     public ResponseEntity<?> userAdd(@RequestBody UserVO user, BindingResult bindingResult, HttpSession session) {
         validator.validate(user, bindingResult);
 
@@ -58,7 +62,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping("/user/login")
     public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session) {
         String password = userService.findByUsername(user.getUsername()).getPassword();
 
@@ -71,13 +75,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/user/logout")
     public ResponseEntity<?> userLogout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
     }
 
-    @PatchMapping("/sign-out")
+    @PatchMapping("/user/sign-out")
     public ResponseEntity<?> userRemove(@RequestBody UserVO user, HttpSession session) {
         //UserVO user = (UserVO) session.getAttribute("user");
         if (user == null) {
@@ -87,6 +91,13 @@ public class UserController {
         userService.removeUser(user.getUsername());
         session.invalidate();
         return ResponseEntity.ok("User deactivated");
+    }
+
+    @GetMapping("/admin/users")
+    public ResponseEntity<List<UserVO>> getUserList(@RequestParam int page,
+                                                    @RequestParam(required = false) String keyword) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return new ResponseEntity<>(userService.findUserList(pageable, keyword), HttpStatus.OK);
     }
 
     private Map<String, String> createErrorMap(BindingResult bindingResult) {
