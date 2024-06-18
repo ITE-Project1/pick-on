@@ -13,23 +13,20 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductVO {
-    private String productId; //사용자 입력
+    private String productId;
+    private int brandId;
     private String name;
     private String description;
     private int price;
     private String imageUrl;
-//    private static String initPid() {
-//        String productId = "pop_" + UUID.randomUUID().toString();
-//        System.out.println(productId);
-//        return productId;
-//    }
 
-//    public static ProductVO of(ProductRequest productRequest) {
-//        return new ProductVO(initPid(),
-//                productRequest.getName(),
-//                productRequest.getDescription(),
-//                productRequest.getPrice(),
-//                productRequest.getImageUrl());
-//
-//    }
+    public static ProductVO of(ProductRequest productRequest, String productId) {
+        return new ProductVO(
+                productId,
+                productRequest.getBrandId(),
+                productRequest.getName(),
+                productRequest.getDescription(),
+                productRequest.getPrice(),
+                productRequest.getImageUrl());
+    }
 }

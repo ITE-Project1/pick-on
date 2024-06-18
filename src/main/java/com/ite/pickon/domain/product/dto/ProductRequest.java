@@ -12,4 +12,5 @@ public class ProductRequest {
     private String description;
     private int price;
     private String imageUrl;
+    private int brandId;
 }
