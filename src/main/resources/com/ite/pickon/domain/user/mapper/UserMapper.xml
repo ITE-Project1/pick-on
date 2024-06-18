@@ -4,17 +4,23 @@
 
 <mapper namespace="com.ite.pickon.domain.user.mapper.UserMapper">
     <insert id="insertUser" parameterType="com.ite.pickon.domain.user.dto.UserVO">
-        INSERT INTO users (user_id, name, username, password, phone_number, role)
-        VALUES (user_seq.NEXTVAL, #{name}, #{username}, #{password}, #{phone_number}, #{role})
+        INSERT INTO USERS (USER_ID, NAME, USERNAME, PASSWORD, PHONE_NUMBER, ROLE)
+        VALUES (USER_SEQ.NEXTVAL, #{name}, #{username}, #{password}, #{phone_number}, #{role})
     </insert>
 
     <select id="selectUser" resultType="UserVO">
-        SELECT * FROM users WHERE username = #{username}
+        SELECT USER_ID, NAME, USERNAME, PASSWORD, PHONE_NUMBER, ROLE,
+            CASE
+               WHEN STATUS = 0 THEN 'ACTIVE'
+               WHEN STATUS = 1 THEN 'INACTIVE'
+               WHEN STATUS = 2 THEN 'BLACK'
+            END as userStatus
+        FROM USERS WHERE USERNAME = #{username}
     </select>
 
     <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserVO">
         SELECT username, password, created_at
-        FROM users
+        FROM USERS
         WHERE role NOT LIKE 'admin'
         <if test="keyword != null and keyword != ''">
             AND (LOWER(username) LIKE '%' || LOWER(#{keyword}) || '%')
@@ -24,8 +30,8 @@
     </select>
     <update id="updateUserStatus">
         UPDATE users
-        SET status = #{statusCode}
-        WHERE username = #{username}
+        SET STATUS = #{statusCode}
+        WHERE USERNAME = #{username}
     </update>
 
 </mapper>
