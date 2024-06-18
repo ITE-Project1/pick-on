@@ -5,8 +5,7 @@
     <update id="updateStatusByFromStoreId">
         UPDATE transport_request
         SET status = 0
-        WHERE from_store_id = #{fromStoreId} AND
-              status = 1;
+        WHERE from_store_id = #{fromStoreId} AND status = 1
     </update>
 
     <!-- 상품 운송 요청 상태 변경 -->
