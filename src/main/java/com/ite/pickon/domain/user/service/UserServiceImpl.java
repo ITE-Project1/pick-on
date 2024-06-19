@@ -16,11 +16,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.ite.pickon.exception.ErrorCode.FIND_FAIL_ORDER_ID;
+import static com.ite.pickon.exception.ErrorCode.FIND_FAIL_USER_ID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -48,5 +51,13 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserStatus(username, userStatus.getStatusCode());
     }
 
+    @Override
+    public Long checkCurrentUser(@SessionAttribute(name ="user", required = false) UserVO user){
 
+        if(user == null){
+            //세션이 만료되었을 경우
+            throw new CustomException(FIND_FAIL_USER_ID);
+        }
+        return user.getUser_id();
+    }
 }
