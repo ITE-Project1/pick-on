@@ -5,6 +5,7 @@ import com.ite.pickon.domain.product.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.selectProductListByStore(storeId, pageable, keyword);
     }
 
+    @Transactional
     public boolean addProduct(ProductRequest productRequest) {
         String brandInitial = productMapper.selectBrandInitialByBrandId(productRequest.getBrandId());
         String productId = generateProductId(brandInitial);
