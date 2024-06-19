@@ -7,6 +7,7 @@ import lombok.*;
 import java.sql.Date;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserVO {

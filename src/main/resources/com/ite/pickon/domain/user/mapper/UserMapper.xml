@@ -18,20 +18,19 @@
         FROM USERS WHERE USERNAME = #{username}
     </select>
 
-    <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserVO">
-        SELECT username, password, created_at
-        FROM USERS
+    <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserAdminVO">
+        SELECT username, created_at as createdAt, status
+        FROM users
         WHERE role NOT LIKE 'admin'
         <if test="keyword != null and keyword != ''">
             AND (LOWER(username) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
-
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
     </select>
+    
     <update id="updateUserStatus">
         UPDATE users
         SET STATUS = #{statusCode}
         WHERE USERNAME = #{username}
     </update>
-
 </mapper>

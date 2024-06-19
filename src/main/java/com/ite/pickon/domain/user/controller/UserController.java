@@ -3,6 +3,7 @@ package com.ite.pickon.domain.user.controller;
 import com.ite.pickon.domain.order.OrderStatus;
 import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.user.UserStatus;
+import com.ite.pickon.domain.user.dto.UserAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.response.SimpleResponse;
@@ -95,10 +96,12 @@ public class UserController {
     }
 
     @GetMapping("/admin/users")
-    public ResponseEntity<List<UserVO>> getUserList(@RequestParam int page,
-                                                    @RequestParam(required = false) String keyword) {
+    public ResponseEntity<List<UserAdminVO>> getUserList(@RequestParam int page,
+                                                         @RequestParam(required = false) String keyword) {
         Pageable pageable = PageRequest.of(page, 10);
-        return new ResponseEntity<>(userService.findUserList(pageable, keyword), HttpStatus.OK);
+        List<UserAdminVO> userList = userService.findUserList(pageable, keyword);
+        System.out.println("---" + userList.size());
+        return ResponseEntity.ok(userList);
     }
 
     @PatchMapping(value = "/admin/users", produces = "application/json; charset=UTF-8")
