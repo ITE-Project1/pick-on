@@ -17,5 +17,4 @@ public interface UserService {
     void modifyUserStatus(String username, UserStatus userStatus);
     Long checkCurrentUser(HttpSession session);
     void modifyUserListStatus(List<String> usernames);
-    public Long findUserId(String username);
 }

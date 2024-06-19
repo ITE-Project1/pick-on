@@ -19,5 +19,4 @@ public interface UserMapper {
     void updateUserListStatus(@Param("usernames") List<String> usernames);
     Long selectUserId(@Param("user_id") Long user_id);
 
-    Long selectUserIdByUsername(String username);
 }
