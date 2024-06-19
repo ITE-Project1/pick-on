@@ -57,11 +57,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long checkCurrentUser(@SessionAttribute(name ="user", required = false) UserVO user){
-        if(user == null){
+    public Long checkCurrentUser(@SessionAttribute(name ="userId", required = false) Long userId){
+        if(userId == null){
             //세션이 만료되었을 경우
-            throw new CustomException(FIND_FAIL_USER_ID);
+            throw new CustomException(ErrorCode.INVALID_SESSION_ID);
         }
-        return user.getUser_id();
+
+        // 현재 로그인 한 유저가 회원인지 확인
+        if (userMapper.selectUserId(userId).equals(userId)){
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        };
+        return userId;
+
     }
 }

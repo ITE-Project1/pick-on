@@ -14,6 +14,6 @@ public interface UserService {
     UserVO findByUsername(String username);
     List<UserAdminVO> findUserList(Pageable pageable, String keyword);
     void modifyUserStatus(String username, UserStatus userStatus);
-    Long checkCurrentUser(@SessionAttribute(name ="loginMember", required = false) UserVO user);
+    Long checkCurrentUser(@SessionAttribute(name ="loginMember", required = false) Long userId);
     void modifyUserListStatus(List<String> usernames);
 }
