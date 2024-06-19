@@ -4,6 +4,7 @@ import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
+import com.ite.pickon.response.LoginResponse;
 import com.ite.pickon.validator.UserValidator;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,14 +63,14 @@ public class UserController {
 
     @PostMapping("/user/login")
     public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session) {
-        String username = user.getUsername();
-        String password = userService.findByUsername(username).getPassword();
+        UserVO userinfo = userService.findByUsername(user.getUsername());
+        String password = userinfo.getPassword();
 
-        // 패스워드 일치 여부 확인
-        if (bCryptPasswordEncoder.matches(user.getPassword(), password)) {
-            session.setAttribute("userId", userService.findUserId(username));
+        // 패스워드 일치 및 활성 여부 확인
+        if (bCryptPasswordEncoder.matches(user.getPassword(), password) && userinfo.getStatus() == UserStatus.ACTIVE) {
+            session.setAttribute("userId", userinfo.getUser_id());
             session.setMaxInactiveInterval(1800);
-            return ResponseEntity.ok("Login successful! Please login.");
+            return ResponseEntity.ok(new LoginResponse("Login successful!", userinfo.getRole()));
         } else {
             return ResponseEntity.status(500).body("An error occurred during login. Please try again.");
         }
