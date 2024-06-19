@@ -57,4 +57,10 @@
             #{username}
         </foreach>
     </update>
+
+    <select id="countTotalUserPages" parameterType="hashmap" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM users
+        WHERE role NOT LIKE 'admin'
+    </select>
 </mapper>

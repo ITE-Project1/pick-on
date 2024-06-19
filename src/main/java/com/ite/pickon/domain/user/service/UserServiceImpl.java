@@ -1,28 +1,25 @@
 package com.ite.pickon.domain.user.service;
 
 
+import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.mapper.UserMapper;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
+import com.ite.pickon.response.ListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-import static com.ite.pickon.exception.ErrorCode.FIND_FAIL_USER_ID;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserMapper userMapper;
 
     @Override
@@ -39,8 +36,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserAdminVO> findUserList(Pageable pageable, String keyword) {
         List<UserAdminVO> userAdminVOList = userMapper.selectUserListByKeyword(pageable, keyword);
-        if (userAdminVOList == null) {
-            throw new CustomException(ErrorCode.FIND_FAIL_USER_ID);
+
+        if (userAdminVOList.size() == 0) {
+            throw new CustomException(ErrorCode.FIND_FAIL_USERS);
         }
         return userAdminVOList;
     }
@@ -55,6 +53,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void modifyUserListStatus(List<String> usernames) {
         userMapper.updateUserListStatus(usernames);
+    }
+
+    @Override
+    public int getTotalPage(String keyword, int userPageSize) {
+        return userMapper.countTotalUserPages(keyword, userPageSize);
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.ite.pickon.domain.user.UserStatus;
 import com.ite.pickon.domain.user.dto.UserAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
+import com.ite.pickon.exception.CustomException;
+import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.LoginResponse;
 import com.ite.pickon.validator.UserValidator;
 import lombok.extern.java.Log;
@@ -26,6 +28,7 @@ import java.util.Map;
 @Log
 @Controller
 public class UserController {
+    private static final int USER_PAGE_SIZE = 10;
 
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -96,6 +99,14 @@ public class UserController {
     @GetMapping("/admin/users")
     public ResponseEntity<List<UserAdminVO>> getUserList(@RequestParam int page,
                                                          @RequestParam(required = false) String keyword) {
+
+        int totalPage = userService.getTotalPage(keyword, USER_PAGE_SIZE);
+
+        // 전체 페이지 개수를 넘는 요청을 보내면 예외 처리
+        if (page >= totalPage) {
+            throw new CustomException(ErrorCode.FIND_FAIL_USERS);
+        }
+
         Pageable pageable = PageRequest.of(page, 10);
         List<UserAdminVO> userList = userService.findUserList(pageable, keyword);
         return ResponseEntity.ok(userList);
