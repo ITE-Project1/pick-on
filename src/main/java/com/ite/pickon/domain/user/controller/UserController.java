@@ -6,6 +6,7 @@ import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
+import com.ite.pickon.response.ListResponse;
 import com.ite.pickon.response.LoginResponse;
 import com.ite.pickon.validator.UserValidator;
 import lombok.extern.java.Log;
@@ -97,8 +98,8 @@ public class UserController {
     }
 
     @GetMapping("/admin/users")
-    public ResponseEntity<List<UserAdminVO>> getUserList(@RequestParam int page,
-                                                         @RequestParam(required = false) String keyword) {
+    public ResponseEntity<ListResponse> getUserList(@RequestParam int page,
+                                                    @RequestParam(required = false) String keyword) {
 
         int totalPage = userService.getTotalPage(keyword, USER_PAGE_SIZE);
 
@@ -108,8 +109,7 @@ public class UserController {
         }
 
         Pageable pageable = PageRequest.of(page, 10);
-        List<UserAdminVO> userList = userService.findUserList(pageable, keyword);
-        return ResponseEntity.ok(userList);
+        return ResponseEntity.ok(userService.findUserList(pageable, keyword, totalPage));
     }
 
     @PatchMapping(value = "/admin/users", produces = "application/json; charset=UTF-8")

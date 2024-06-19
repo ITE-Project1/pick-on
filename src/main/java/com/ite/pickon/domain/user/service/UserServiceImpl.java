@@ -34,13 +34,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserAdminVO> findUserList(Pageable pageable, String keyword) {
+    public ListResponse findUserList(Pageable pageable, String keyword, int totalPage) {
         List<UserAdminVO> userAdminVOList = userMapper.selectUserListByKeyword(pageable, keyword);
 
         if (userAdminVOList.size() == 0) {
             throw new CustomException(ErrorCode.FIND_FAIL_USERS);
         }
-        return userAdminVOList;
+
+        return new ListResponse(userAdminVOList, totalPage);
     }
 
     @Override
