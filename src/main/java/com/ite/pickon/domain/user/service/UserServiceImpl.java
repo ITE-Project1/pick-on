@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 import static com.ite.pickon.exception.ErrorCode.FIND_FAIL_USER_ID;
@@ -57,7 +58,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long checkCurrentUser(@SessionAttribute(name ="userId", required = false) Long userId){
+    public Long findUserId(String username) {
+        return userMapper.selectUserIdByUsername(username);
+    }
+
+    @Override
+    public Long checkCurrentUser(HttpSession session){
+        Long userId = (Long)session.getAttribute("userId");
         if(userId == null){
             //세션이 만료되었을 경우
             throw new CustomException(ErrorCode.INVALID_SESSION_ID);
@@ -65,9 +72,9 @@ public class UserServiceImpl implements UserService {
 
         // 현재 로그인 한 유저가 회원인지 확인
         if (userMapper.selectUserId(userId).equals(userId)){
+            return userId;
+        } else {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
-        };
-        return userId;
-
+        }
     }
 }
