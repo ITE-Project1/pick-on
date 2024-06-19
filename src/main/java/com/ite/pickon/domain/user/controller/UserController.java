@@ -62,11 +62,12 @@ public class UserController {
 
     @PostMapping("/user/login")
     public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session) {
-        String password = userService.findByUsername(user.getUsername()).getPassword();
+        String username = user.getUsername();
+        String password = userService.findByUsername(username).getPassword();
 
         // 패스워드 일치 여부 확인
         if (bCryptPasswordEncoder.matches(user.getPassword(), password)) {
-            session.setAttribute("userId", user.getUser_id());
+            session.setAttribute("userId", userService.findUserId(username));
             session.setMaxInactiveInterval(1800);
             return ResponseEntity.ok("Login successful! Please login.");
         } else {
@@ -82,7 +83,7 @@ public class UserController {
 
     @PatchMapping("/user/sign-out")
     public ResponseEntity<?> userRemove(@RequestBody UserVO user, HttpSession session) {
-        //UserVO user = (UserVO) session.getAttribute("user");
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
