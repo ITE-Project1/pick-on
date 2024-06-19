@@ -58,11 +58,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long findUserId(String username) {
-        return userMapper.selectUserIdByUsername(username);
-    }
-
-    @Override
     public Long checkCurrentUser(HttpSession session){
         Long userId = (Long)session.getAttribute("userId");
         if(userId == null){
