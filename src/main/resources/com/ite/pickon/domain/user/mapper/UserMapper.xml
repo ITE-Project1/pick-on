@@ -25,7 +25,7 @@
                WHEN STATUS = 0 THEN 'ACTIVE'
                WHEN STATUS = 1 THEN 'INACTIVE'
                WHEN STATUS = 2 THEN 'BLACK'
-            END as userStatus
+            END as status
         FROM USERS WHERE USERNAME = #{username}
     </select>
 
