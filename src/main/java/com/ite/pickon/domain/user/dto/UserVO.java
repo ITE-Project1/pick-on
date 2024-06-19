@@ -2,13 +2,14 @@ package com.ite.pickon.domain.user.dto;
 
 
 import com.ite.pickon.domain.user.UserStatus;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.sql.Date;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserVO {
     private Long user_id;
     private String name;
