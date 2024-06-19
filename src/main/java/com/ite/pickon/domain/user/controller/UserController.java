@@ -100,7 +100,7 @@ public class UserController {
 
     @PatchMapping(value = "/admin/users", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> userStatusModify(@RequestBody List<String> usernames) {
-        userService.modifyUserListStatus(usernames, UserStatus.BLACK);
+        userService.modifyUserListStatus(usernames);
         return ResponseEntity.ok("User blacked");
     }
 

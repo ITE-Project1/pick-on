@@ -36,7 +36,10 @@
 
     <update id="updateUserListStatus">
         UPDATE users
-        SET status = #{statusCode}
+        SET status = CASE status
+        WHEN 0 THEN 2
+        WHEN 2 THEN 0
+        END
         WHERE username IN
         <foreach item="username" index="index" collection="usernames" open="(" separator="," close=")">
             #{username}

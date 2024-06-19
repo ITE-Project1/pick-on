@@ -13,5 +13,5 @@ public interface UserService {
     UserVO findByUsername(String username);
     List<UserAdminVO> findUserList(Pageable pageable, String keyword);
     void modifyUserStatus(String username, UserStatus userStatus);
-    void modifyUserListStatus(List<String> usernames, UserStatus userStatus);
+    void modifyUserListStatus(List<String> usernames);
 }
