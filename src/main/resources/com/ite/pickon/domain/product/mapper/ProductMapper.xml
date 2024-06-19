@@ -62,4 +62,16 @@
         from brand
         where brand_id = #{brandId}
     </select>
+
+<!--    지점별 상품목록 페이지에서 나올 수 있는 모든 데이터 개수-->
+    <select id="countTotalProductPages" parameterType="hashmap" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM store s
+        JOIN stock stk ON s.store_id = stk.store_id
+        JOIN product p ON stk.product_id = p.product_id
+        WHERE s.store_id = #{storeId}
+        <if test="keyword != null and keyword != ''">
+            AND (LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%')
+        </if>
+    </select>
 </mapper>

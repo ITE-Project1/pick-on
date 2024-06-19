@@ -36,6 +36,7 @@
         <if test="keyword != null and keyword != ''">
             AND (LOWER(username) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
+        ORDER BY created_at desc
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
     </select>
     

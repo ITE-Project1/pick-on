@@ -2,6 +2,9 @@ package com.ite.pickon.domain.product.service;
 
 import com.ite.pickon.domain.product.dto.*;
 import com.ite.pickon.domain.product.mapper.ProductMapper;
+import com.ite.pickon.exception.CustomException;
+import com.ite.pickon.exception.ErrorCode;
+import com.ite.pickon.response.ListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,8 +19,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public List<ProductAdminVO> findProductList(String storeId, Pageable pageable, String keyword) {
-        return productMapper.selectProductListByStore(storeId, pageable, keyword);
+    public ListResponse findProductList(int storeId, Pageable pageable, String keyword, int totalPage) {
+        List<ProductAdminVO> productAdminList = productMapper.selectProductListByStore(storeId, pageable, keyword);
+        if (productAdminList.size() == 0) {
+            throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
+        }
+
+        return new ListResponse(productAdminList, totalPage);
     }
 
     @Transactional
@@ -36,6 +44,11 @@ public class ProductServiceImpl implements ProductService {
 
     public List<ProductListVO> getList(Pageable pageable, String keyword){
         return productMapper.selectProductList(pageable, keyword);
+    }
+
+    @Override
+    public int getTotalPage(int storeId, String keyword, int pageSize) {
+        return productMapper.countTotalProductPages(storeId, keyword, pageSize);
     }
 
     // 상품 ID 생성
