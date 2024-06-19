@@ -7,6 +7,12 @@
     <name>pickon</name>
     <packaging>war</packaging>
     <version>1.0.0-BUILD-SNAPSHOT</version>
+    <properties>
+        <java-version>11</java-version>
+        <org.springframework-version>5.0.7.RELEASE</org.springframework-version>
+        <org.aspectj-version>1.9.0</org.aspectj-version>
+        <org.slf4j-version>1.7.0</org.slf4j-version>
+    </properties>
     <dependencies>
         <!-- Spring -->
         <dependency>
@@ -26,6 +32,36 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework-version}</version>
         </dependency>
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.17.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.17.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.17.1</version>
+        </dependency>
+
+        <!-- Log4jdbc -->
+        <dependency>
+            <groupId>org.bgee.log4jdbc-log4j2</groupId>
+            <artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+            <version>1.16</version>
+        </dependency>
+
+        <!-- SLF4J API -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
 
         <!-- AspectJ -->
         <dependency>
@@ -33,13 +69,11 @@
             <artifactId>aspectjrt</artifactId>
             <version>${org.aspectj-version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <version>${org.aspectj-version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjtools</artifactId>
@@ -249,12 +283,7 @@
             <version>2.12.3</version>
         </dependency>
     </dependencies>
-    <properties>
-        <java-version>11</java-version>
-        <org.springframework-version>5.0.7.RELEASE</org.springframework-version>
-        <org.aspectj-version>1.9.0</org.aspectj-version>
-        <org.slf4j-version>1.6.6</org.slf4j-version>
-    </properties>
+
     <build>
         <plugins>
             <plugin>
