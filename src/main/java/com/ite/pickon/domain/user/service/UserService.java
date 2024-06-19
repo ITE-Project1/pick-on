@@ -17,4 +17,6 @@ public interface UserService {
     void modifyUserStatus(String username, UserStatus userStatus);
     Long checkCurrentUser(HttpSession session);
     void modifyUserListStatus(List<String> usernames);
+
+    int getTotalPage(String keyword, int userPageSize);
 }
