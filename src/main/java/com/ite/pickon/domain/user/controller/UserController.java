@@ -71,7 +71,7 @@ public class UserController {
         // 패스워드 일치 여부 확인
         if (bCryptPasswordEncoder.matches(user.getPassword(), password)) {
             session.setAttribute("user", user);
-            return ResponseEntity.ok("Login successful!");
+            return ResponseEntity.ok("Login successful! Please login.");
         } else {
             return ResponseEntity.status(500).body("An error occurred during login. Please try again.");
         }
