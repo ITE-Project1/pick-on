@@ -21,7 +21,7 @@ public class UserValidator implements Validator {
         // 사용자 이름 검증
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "NotEmpty");
         if (userVO.getUsername().length() < 3 || userVO.getUsername().length() > 32) {
-            errors.rejectValue("username", "Size.userForm.username", "사용자 이름은 3자 이상 32자 이하이어야 합니다.");
+            errors.rejectValue("username", "Size.userForm.username", "사용자 아이디는 3자 이상 32자 이하이어야 합니다.");
         }
 
         // 비밀번호 검증
