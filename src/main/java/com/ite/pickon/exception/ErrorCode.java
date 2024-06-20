@@ -14,7 +14,8 @@ public enum ErrorCode {
     FIND_FAIL_PRODUCTS(400, "원하는 상품 목록을 불러올 수 없습니다."),
     FIND_FAIL_USERS(400, "원하는 유저 목록을 불러올 수 없습니다."),
     INVALID_SESSION_ID(440, "세션이 만료되었습니다. 다시 로그인해주세요"),
-    UNAUTHORIZED(401, "지정한 리소스에 대한 액세스 권한이 없습니다.");
+    UNAUTHORIZED(401, "지정한 리소스에 대한 액세스 권한이 없습니다."),
+    FAIL_TO_LOGIN(400, "로그인 정보가 일치하지 않습니다. 다시 로그인해주세요.");
 
     private final int status;
     private final String message;

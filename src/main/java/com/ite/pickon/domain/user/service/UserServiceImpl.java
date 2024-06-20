@@ -30,7 +30,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO findByUsername(String username) {
-        return userMapper.selectUser(username);
+
+        if (username == null) {
+            throw new CustomException(ErrorCode.FAIL_TO_LOGIN);
+        }
+        UserVO user = userMapper.selectUser(username);
+        if (user == null) {
+            throw new CustomException(ErrorCode.FAIL_TO_LOGIN);
+        }
+        return user;
     }
 
     @Override

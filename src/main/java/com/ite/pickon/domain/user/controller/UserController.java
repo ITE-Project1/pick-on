@@ -50,7 +50,6 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(createErrorMap(bindingResult), HttpStatus.BAD_REQUEST);
         }
-
         try {
             // 사용자 등록
             user.setRole("general");
