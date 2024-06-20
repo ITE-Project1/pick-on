@@ -25,4 +25,7 @@ public interface ProductMapper {
     int countTotalProductPages(@Param("storeId") int storeId,
                                @Param("keyword") String keyword,
                                @Param("pageSize") int pageSize);
+
+    int countTotalBasicProductPages(@Param("keyword") String keyword,
+                                    @Param("pageSize") int pageSize);
 }
