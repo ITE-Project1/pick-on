@@ -17,10 +17,12 @@ public class OrderRes {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date pickupDate;
     private String fromStore;
+    private String toStore;
     private String pickupStatus;
     private String prodcutImg;
     private String productName;
     private String productId;
     private int quantity;
     private int totalPrice;
+    private String userPhoneNumber;
 }

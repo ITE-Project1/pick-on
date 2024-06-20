@@ -63,6 +63,7 @@
                  FROM TRANSPORT_REQUEST TR
                           JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
                  WHERE TR.ORDER_ID = O.ORDER_ID), '-') as fromStore,
+            S.NAME as toStore,
             CASE
                 WHEN O.STATUS = 2 THEN '대기'
                 WHEN O.STATUS = 0 THEN '배송중'
@@ -73,11 +74,13 @@
             P.NAME as productName,
             O.PRODUCT_ID as productId,
             O.QUANTITY as quantity,
-            O.TOTAL_PRICE as totalPrice
+            O.TOTAL_PRICE as totalPrice,
+            U.PHONE_NUMBER as userPhoneNumber
         FROM
             ORDERS O
                 JOIN STORE S ON O.STORE_ID = S.STORE_ID
                 JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+                JOIN USERS U ON O.USER_ID = U.USER_ID
         WHERE
             O.ORDER_ID = #{orderId}
     </select>
