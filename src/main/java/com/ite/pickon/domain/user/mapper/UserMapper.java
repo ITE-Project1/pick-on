@@ -15,7 +15,7 @@ public interface UserMapper {
 
     List<UserAdminVO> selectUserListByKeyword(@Param("pageable") Pageable pageable, @Param("keyword") String keyword);
 
-    void updateUserStatus(@Param("username") String usernames, @Param("statusCode") int statusCode);
+    void updateUserStatus(@Param("user_id") Long user_id, @Param("statusCode") int statusCode);
 
     void updateUserListStatus(@Param("usernames") List<String> usernames);
 

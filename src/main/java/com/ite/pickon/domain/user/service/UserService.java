@@ -15,7 +15,7 @@ public interface UserService {
     void addUser(UserVO user);
     UserVO findByUsername(String username);
     ListResponse findUserList(Pageable pageable, String keyword, int totalPage);
-    void modifyUserStatus(String username, UserStatus userStatus);
+    void modifyUserStatus(Long userId, UserStatus userStatus);
     Long checkCurrentUser(HttpSession session);
     void modifyUserListStatus(List<String> usernames);
 

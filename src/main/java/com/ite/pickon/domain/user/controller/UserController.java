@@ -87,12 +87,12 @@ public class UserController {
     }
 
     @PatchMapping("/user/sign-out")
-    public ResponseEntity<?> userRemove(@RequestBody UserVO user, HttpSession session) {
-
-        if (user == null) {
+    public ResponseEntity<?> userRemove(HttpSession session) {
+        Long userId = userService.checkCurrentUser(session);
+        if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        userService.modifyUserStatus(user.getUsername(), UserStatus.INACTIVE);
+        userService.modifyUserStatus(userId, UserStatus.INACTIVE);
         session.invalidate();
         return ResponseEntity.ok("User deactivated");
     }

@@ -46,8 +46,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void modifyUserStatus(String username, UserStatus userStatus) {
-        userMapper.updateUserStatus(username, userStatus.getStatusCode());
+    public void modifyUserStatus(Long userId, UserStatus userStatus) {
+        userMapper.updateUserStatus(userId, userStatus.getStatusCode());
     }
 
     @Override
