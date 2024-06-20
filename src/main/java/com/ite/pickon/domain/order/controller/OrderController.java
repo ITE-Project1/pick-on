@@ -6,6 +6,7 @@ import com.ite.pickon.domain.order.dto.OrderRequest;
 import com.ite.pickon.domain.order.dto.OrderResponse;
 import com.ite.pickon.domain.order.service.OrderService;
 import com.ite.pickon.domain.transport.TransportStatus;
+import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.response.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -25,6 +27,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserService userService;
 
     private static final int PAGE_SIZE = 10;
 
@@ -33,8 +36,8 @@ public class OrderController {
      * [POST] /orders
      */
     @PostMapping(value="/orders", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<SimpleResponse> orderAdd(@RequestParam("userId") Long userId,
-                                              @RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<SimpleResponse> orderAdd(HttpSession session, @RequestBody OrderRequest orderRequest) {
+        Long userId = userService.checkCurrentUser(session);
         orderService.addOrder(userId, orderRequest);
         return new ResponseEntity<>(new SimpleResponse("주문이 완료되었습니다."), HttpStatus.OK);
     }
