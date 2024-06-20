@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         // 문자 전송
-        smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
+//        smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
     }
 
     // 주문코드 생성
