@@ -1,6 +1,6 @@
 package com.ite.pickon.domain.stock.mapper;
 
-import com.ite.pickon.domain.stock.dto.StockReq;
+import com.ite.pickon.domain.stock.dto.StockRequest;
 import com.ite.pickon.domain.stock.dto.StockVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,7 +16,7 @@ public interface StockMapper {
                              @Param("productId") String productId,
                              @Param("quantityChange") int quantityChange);
     // 재고 생성
-    void insertStock(@Param("stockReq") StockReq stockReq);
+    void insertStock(@Param("stockRequest") StockRequest stockRequest);
 
     // 해당 지점에 상품 존재 여부 확인
     int checkStockExists(@Param("storeId") int storeId, @Param("productId") String productId);

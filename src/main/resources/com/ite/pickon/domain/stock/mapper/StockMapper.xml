@@ -19,9 +19,9 @@
     <!-- 재고 생성 -->
     <insert id="insertStock">
         INSERT INTO STOCK (STORE_ID, PRODUCT_ID, QUANTITY)
-        VALUES (#{stockReq.storeId},
-                #{stockReq.productId},
-                #{stockReq.quantity})
+        VALUES (#{stockRequest.storeId},
+                #{stockRequest.productId},
+                #{stockRequest.quantity})
     </insert>
 
     <!-- 해당 지점에 상품 존재 여부 확인 -->

@@ -7,14 +7,14 @@
     <insert id="insertOrder">
         INSERT INTO ORDERS (ORDER_ID, USER_ID, STORE_ID, PRODUCT_ID, PICKUP_DATE, QUANTITY, TOTAL_PRICE, STATUS)
         VALUES (
-                #{orderReq.orderId},
+                #{orderRequest.orderId},
                 #{userId},
-                #{orderReq.storeId},
-                #{orderReq.productId},
+                #{orderRequest.storeId},
+                #{orderRequest.productId},
                 #{pickupDate},
-                #{orderReq.quantity},
-                (SELECT PRICE FROM PRODUCT WHERE PRODUCT_ID = #{orderReq.productId}) * #{orderReq.quantity},
-                #{orderReq.status})
+                #{orderRequest.quantity},
+                (SELECT PRICE FROM PRODUCT WHERE PRODUCT_ID = #{orderRequest.productId}) * #{orderRequest.quantity},
+                #{orderRequest.status})
     </insert>
 
     <!-- 운송 요청 생성 -->
@@ -23,12 +23,12 @@
         VALUES (
                    transport_request_seq.NEXTVAL,
                    #{fromStoreId},
-                   #{orderReq.storeId},
-                   #{orderReq.orderId})
+                   #{orderRequest.storeId},
+                   #{orderRequest.orderId})
     </insert>
 
     <!-- 주문 목록 조회 -->
-    <select id="selectOrderListByStore" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MultiOrderRes">
+    <select id="selectOrderListByStore" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MultiOrderResponse">
         SELECT
             O.ORDER_ID as orderId,
             O.QUANTITY as quantity,
@@ -54,7 +54,7 @@
     </select>
 
     <!-- 주문 상세 조회 -->
-    <select id="selectOrderById" parameterType="string" resultType="com.ite.pickon.domain.order.dto.OrderRes">
+    <select id="selectOrderById" parameterType="string" resultType="com.ite.pickon.domain.order.dto.OrderResponse">
         SELECT
             O.ORDER_ID as orderId,
             CAST(O.CREATED_AT AS TIMESTAMP) as orderDate,

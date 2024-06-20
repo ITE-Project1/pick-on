@@ -10,7 +10,7 @@ import java.sql.Date;
 @Builder
 @Getter
 @ToString
-public class OrderRes {
+public class OrderResponse {
     private String orderId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date orderDate;
