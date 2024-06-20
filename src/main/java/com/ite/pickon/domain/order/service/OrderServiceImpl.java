@@ -85,9 +85,8 @@ public class OrderServiceImpl implements OrderService {
 
     // 주문코드 생성
     private String generateOrderId(int storeId) {
-        String datePart = new SimpleDateFormat("yyMMdd").format(new Date());
-        String uuidPart = UUID.randomUUID().toString().replace("-", "").substring(0, 4).toUpperCase();
-        return "PO" + storeId + datePart + uuidPart;
+        String uuidPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return "PO" + storeId + uuidPart;
     }
 
     // 주문 생성
