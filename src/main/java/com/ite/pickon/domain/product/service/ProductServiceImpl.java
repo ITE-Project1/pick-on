@@ -45,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     public ListResponse getList(Pageable pageable, String keyword, int totalPage){
 
         List<ProductListVO> productList = productMapper.selectProductList(pageable, keyword);
+
         if (productList.size() == 0) {
             throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
         }
