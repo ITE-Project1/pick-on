@@ -6,6 +6,7 @@ import com.ite.pickon.domain.order.dto.OrderRequest;
 import com.ite.pickon.domain.order.dto.OrderResponse;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
 import com.ite.pickon.domain.sms.service.SmsService;
+import com.ite.pickon.domain.sms.template.SmsMessageTemplate;
 import com.ite.pickon.domain.stock.service.StockService;
 import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.domain.transport.dto.TransportVO;
@@ -34,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final TransportService transportService;
     private final StockService stockService;
     private final SmsService smsService;
+    private final SmsMessageTemplate smsMessageTemplate;
 
     // 주문하기 & 재고 요청하기
     @Override
@@ -70,16 +72,12 @@ public class OrderServiceImpl implements OrderService {
         OrderResponse orderResponse = orderMapper.selectOrderById(orderRequest.getOrderId());
 
         // 문자 내용 생성
-        String message = String.format("[픽온] 주문이 완료되었습니다.\n" +
-                                        "주문 번호: %s\n" +
-                                        "픽업 예상 날짜: %s\n" +
-                                        "수령 지점: %s\n" +
-                                        "상품명: %s\n" +
-                                        "지점별 영업 시간 확인 후 방문 부탁드립니다.",
+        String message = smsMessageTemplate.getOrderCompletionMessage(
                 orderRequest.getOrderId(),
                 orderRequest.getDirectPickup() == 1 ? "즉시 가능" : transportVO.getArrivalTime().toString(),
                 orderResponse.getToStore(),
-                orderResponse.getProductName());
+                orderResponse.getProductName()
+        );
 
         // 문자 전송
         smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
