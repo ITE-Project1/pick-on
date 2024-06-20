@@ -46,11 +46,23 @@
             JOIN STORE S ON O.STORE_ID = S.STORE_ID
             JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
         WHERE O.STORE_ID = #{storeId}
+            AND O.STATUS != 3
         <if test="keyword != null and keyword != ''">
             AND (LOWER(O.ORDER_ID) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
-        ORDER BY O.CREATED_AT DESC, O.ORDER_ID DESC
+        ORDER BY O.STATUS ASC, O.ORDER_ID ASC
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <!-- 전체 주문 목록 페이지 갯수 조회 -->
+    <select id="countTotalOrderPages" parameterType="hashmap" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM ORDERS O
+        JOIN STORE S ON O.STORE_ID = S.STORE_ID
+        WHERE S.STORE_ID = #{storeId}
+        <if test="keyword != null and keyword != ''">
+            AND (LOWER(O.ORDER_ID) LIKE '%' || LOWER(#{keyword}) || '%')
+        </if>
     </select>
 
     <!-- 주문 상세 조회 -->

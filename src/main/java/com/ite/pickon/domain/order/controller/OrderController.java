@@ -1,12 +1,14 @@
 package com.ite.pickon.domain.order.controller;
 
 import com.ite.pickon.domain.order.OrderStatus;
-import com.ite.pickon.domain.order.dto.MultiOrderResponse;
 import com.ite.pickon.domain.order.dto.OrderRequest;
 import com.ite.pickon.domain.order.dto.OrderResponse;
 import com.ite.pickon.domain.order.service.OrderService;
 import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.domain.user.service.UserService;
+import com.ite.pickon.exception.CustomException;
+import com.ite.pickon.exception.ErrorCode;
+import com.ite.pickon.response.ListResponse;
 import com.ite.pickon.response.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,11 +49,19 @@ public class OrderController {
      * [GET] /admin/orders?storeId={지점인덱스}&page={페이지번호}&keyword={검색키워드}
      */
     @GetMapping("/admin/orders")
-    public ResponseEntity<List<MultiOrderResponse>> orderList(@RequestParam String storeId,
-                                                              @RequestParam int page,
-                                                              @RequestParam(required = false) String keyword) {
+    public ResponseEntity<ListResponse> orderList(@RequestParam int storeId,
+                                                  @RequestParam int page,
+                                                  @RequestParam(required = false) String keyword) {
 
-        return new ResponseEntity<>(orderService.findOrderList(storeId, page, PAGE_SIZE, keyword), HttpStatus.OK);
+        // 전체 페이지 개수
+        int totalPage = orderService.getTotalPage(storeId, keyword, PAGE_SIZE);
+
+        // 전체 페이지 개수를 넘는 요청을 보내면 예외 처리
+        if (page >= totalPage) {
+            throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
+        }
+
+        return new ResponseEntity<>(orderService.findOrderList(storeId, page, PAGE_SIZE, keyword, totalPage), HttpStatus.OK);
     }
 
 

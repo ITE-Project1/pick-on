@@ -14,6 +14,8 @@ import com.ite.pickon.domain.transport.mapper.TransportMapper;
 import com.ite.pickon.domain.transport.service.TransportService;
 import com.ite.pickon.domain.user.mapper.UserMapper;
 import com.ite.pickon.exception.CustomException;
+import com.ite.pickon.exception.ErrorCode;
+import com.ite.pickon.response.ListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,9 +116,19 @@ public class OrderServiceImpl implements OrderService {
     // 주문 목록 조회
     @Override
     @Transactional
-    public List<MultiOrderResponse> findOrderList(String storeId, int page, int pageSize, String keyword) {
+    public ListResponse findOrderList(int storeId, int page, int pageSize, String keyword, int totalPage) {
         int offset = (page - 1) * pageSize;
-        return orderMapper.selectOrderListByStore(storeId, offset, pageSize, keyword);
+        List<MultiOrderResponse> orderList =  orderMapper.selectOrderListByStore(storeId, offset, pageSize, keyword);
+        if(orderList.size() == 0) {
+            throw  new CustomException(ErrorCode.FIND_FAIL_ORDERS);
+        }
+        return new ListResponse(orderList, totalPage);
+    }
+
+    // 지점별 주문 목록 전체 페이지 개수 조회
+    @Override
+    public int getTotalPage(int storeId, String keyword, int pageSize) {
+        return orderMapper.countTotalOrderPages(storeId, keyword, pageSize);
     }
 
     // 주문 상세조회

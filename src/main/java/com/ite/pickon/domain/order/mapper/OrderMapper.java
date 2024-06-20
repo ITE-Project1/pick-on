@@ -19,10 +19,15 @@ public interface OrderMapper {
                                 @Param("fromStoreId") int fromStoreId);
 
     // 주문 목록 조회
-    List<MultiOrderResponse> selectOrderListByStore(@Param("storeId") String storeId,
+    List<MultiOrderResponse> selectOrderListByStore(@Param("storeId") int storeId,
                                                     @Param("offset") int offset,
                                                     @Param("pageSize") int pageSize,
                                                     @Param("keyword") String keyword);
+
+    // 전체 주문 목록 페이지 갯수 조회
+    int countTotalOrderPages(@Param("storeId") int storeId,
+                             @Param("keyword") String keyword,
+                             @Param("pageSize") int pageSize);
 
     // 주문 상세 조회
     OrderResponse selectOrderById(@Param("orderId") String orderId);
