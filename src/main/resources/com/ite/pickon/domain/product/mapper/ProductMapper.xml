@@ -74,4 +74,14 @@
             AND (LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
     </select>
+
+
+    <select id="countTotalBasicProductPages" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM product
+        <if test="keyword != null and keyword != ''">
+            where LOWER(name) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+        </if>
+    </select>
 </mapper>
