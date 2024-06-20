@@ -26,11 +26,6 @@ public class CoolSmsService implements SmsService {
 
     @Override
     public void sendSms(String toPhone, String content) {
-
-        log.info("API Key: " + apiKey); // 로그로 API 키 확인
-        log.info("API Secret: " + apiSecret); // 로그로 API 시크릿 확인
-        log.info("From Phone: " + fromPhone); // 로그로 발신번호 확인
-
         DefaultMessageService messageService =  NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "http://api.coolsms.co.kr");
         Message message = new Message();
         message.setFrom(fromPhone.replace("-", ""));
@@ -40,15 +35,11 @@ public class CoolSmsService implements SmsService {
         try {
             messageService.send(message);
         } catch (NurigoMessageNotReceivedException e) {
-            log.error("=================1================");
             log.error(e.getFailedMessageList());
             log.error(e.getMessage());
-            e.printStackTrace();
             throw new CustomException(FAIL_SUBMIT_SMS);
         } catch (Exception e) {
-            log.error("=================2================");
             log.error(e.getMessage());
-            e.printStackTrace();
             throw new CustomException(FAIL_SEND_SMS);
         }
     }

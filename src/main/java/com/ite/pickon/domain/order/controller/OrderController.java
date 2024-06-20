@@ -1,11 +1,12 @@
 package com.ite.pickon.domain.order.controller;
 
 import com.ite.pickon.domain.order.OrderStatus;
-import com.ite.pickon.domain.order.dto.MultiOrderRes;
-import com.ite.pickon.domain.order.dto.OrderReq;
-import com.ite.pickon.domain.order.dto.OrderRes;
+import com.ite.pickon.domain.order.dto.MultiOrderResponse;
+import com.ite.pickon.domain.order.dto.OrderRequest;
+import com.ite.pickon.domain.order.dto.OrderResponse;
 import com.ite.pickon.domain.order.service.OrderService;
 import com.ite.pickon.domain.transport.TransportStatus;
+import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.response.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -25,6 +27,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserService userService;
 
     private static final int PAGE_SIZE = 10;
 
@@ -33,9 +36,9 @@ public class OrderController {
      * [POST] /orders
      */
     @PostMapping(value="/orders", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<SimpleResponse> orderAdd(@RequestParam("userId") Long userId,
-                                              @RequestBody OrderReq orderReq) {
-        orderService.addOrder(userId, orderReq);
+    public ResponseEntity<SimpleResponse> orderAdd(HttpSession session, @RequestBody OrderRequest orderRequest) {
+        Long userId = userService.checkCurrentUser(session);
+        orderService.addOrder(userId, orderRequest);
         return new ResponseEntity<>(new SimpleResponse("주문이 완료되었습니다."), HttpStatus.OK);
     }
 
@@ -44,9 +47,9 @@ public class OrderController {
      * [GET] /admin/orders?storeId={지점인덱스}&page={페이지번호}&keyword={검색키워드}
      */
     @GetMapping("/admin/orders")
-    public ResponseEntity<List<MultiOrderRes>> orderList(@RequestParam String storeId,
-                                                                  @RequestParam int page,
-                                                                  @RequestParam(required = false) String keyword) {
+    public ResponseEntity<List<MultiOrderResponse>> orderList(@RequestParam String storeId,
+                                                              @RequestParam int page,
+                                                              @RequestParam(required = false) String keyword) {
 
         return new ResponseEntity<>(orderService.findOrderList(storeId, page, PAGE_SIZE, keyword), HttpStatus.OK);
     }
@@ -57,9 +60,9 @@ public class OrderController {
      *  [GET] /admin/orders/:{orderId}
      */
     @GetMapping("/admin/orders/{orderId}")
-    public ResponseEntity<OrderRes> orderDetails(@PathVariable String orderId) {
-        OrderRes orderRes = orderService.findOrderDetail(orderId);
-        return new ResponseEntity<>(orderRes, HttpStatus.OK);
+    public ResponseEntity<OrderResponse> orderDetails(@PathVariable String orderId) {
+        OrderResponse orderResponse = orderService.findOrderDetail(orderId);
+        return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
 
     /**

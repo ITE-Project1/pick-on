@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderReq {
+public class OrderRequest {
     private String orderId;
     private String productId;
     private int quantity;
