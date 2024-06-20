@@ -43,7 +43,7 @@
     <update id="updateUserStatus">
         UPDATE users
         SET STATUS = #{statusCode}
-        WHERE USERNAME = #{username}
+        WHERE USER_ID = ${user_id}
     </update>
 
     <update id="updateUserListStatus">
