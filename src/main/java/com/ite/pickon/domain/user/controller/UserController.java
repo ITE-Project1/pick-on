@@ -71,9 +71,17 @@ public class UserController {
 
         // 패스워드 일치 및 활성 여부 확인
         if (bCryptPasswordEncoder.matches(user.getPassword(), password) && userinfo.getStatus() == UserStatus.ACTIVE) {
+            // 세션 데이터 저장
             session.setAttribute("userId", userinfo.getUser_id());
+            session.setAttribute("role", userinfo.getRole());
             session.setMaxInactiveInterval(1800);
-            return ResponseEntity.ok(new LoginResponse("Login successful!", userinfo.getRole()));
+
+            // 프론트에 넘겨줄 정보 저장
+            Map<String, Object> sessionData = new HashMap<>();
+            sessionData.put("userId", userinfo.getUser_id());
+            sessionData.put("role", userinfo.getRole());
+
+            return ResponseEntity.ok(sessionData);
         } else {
             return ResponseEntity.status(500).body("An error occurred during login. Please try again.");
         }
