@@ -2,6 +2,7 @@ package com.ite.pickon.domain.order.service;
 
 import com.ite.pickon.domain.order.OrderStatus;
 import com.ite.pickon.domain.order.dto.MultiOrderResponse;
+import com.ite.pickon.domain.order.dto.MyOrderResponse;
 import com.ite.pickon.domain.order.dto.OrderRequest;
 import com.ite.pickon.domain.order.dto.OrderResponse;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
@@ -14,7 +15,10 @@ import com.ite.pickon.domain.transport.mapper.TransportMapper;
 import com.ite.pickon.domain.transport.service.TransportService;
 import com.ite.pickon.domain.user.mapper.UserMapper;
 import com.ite.pickon.exception.CustomException;
+import com.ite.pickon.exception.ErrorCode;
+import com.ite.pickon.response.ListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,9 +89,8 @@ public class OrderServiceImpl implements OrderService {
 
     // 주문코드 생성
     private String generateOrderId(int storeId) {
-        String datePart = new SimpleDateFormat("yyMMdd").format(new Date());
-        String uuidPart = UUID.randomUUID().toString().replace("-", "").substring(0, 4).toUpperCase();
-        return "PO" + storeId + datePart + uuidPart;
+        String uuidPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return "PO" + storeId + uuidPart;
     }
 
     // 주문 생성
@@ -115,9 +118,39 @@ public class OrderServiceImpl implements OrderService {
     // 주문 목록 조회
     @Override
     @Transactional
-    public List<MultiOrderResponse> findOrderList(String storeId, int page, int pageSize, String keyword) {
-        int offset = (page - 1) * pageSize;
-        return orderMapper.selectOrderListByStore(storeId, offset, pageSize, keyword);
+    public ListResponse findOrderList(int storeId, Pageable pageable, String keyword, int totalPage) {
+        List<MultiOrderResponse> orderList =  orderMapper.selectOrderListByStore(storeId, pageable, keyword);
+        if(orderList.size() == 0) {
+            throw  new CustomException(ErrorCode.FIND_FAIL_ORDERS);
+        }
+        return new ListResponse(orderList, totalPage);
+    }
+
+    // 지점별 주문 목록 전체 페이지 개수 조회
+    @Override
+    public int getTotalPage(int storeId, String keyword, int pageSize) {
+        return orderMapper.countTotalOrderPages(storeId, keyword, pageSize);
+    }
+
+    // 나의 주문 내역 조회
+    @Override
+    public ListResponse findMyOrderList(Long userId, Pageable pageable, int totalPage) {
+        try {
+            List<MyOrderResponse> orderList =  orderMapper.selectMyOrderList(userId, pageable);
+            if(orderList.size() == 0) {
+                throw  new CustomException(ErrorCode.FIND_FAIL_ORDERS);
+            }
+            return new ListResponse(orderList, totalPage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // 나의 주문 목록 전체 페이지 개수 조회
+    @Override
+    public int getTotalBasePage(Long userId, int pageSize) {
+        return orderMapper.countTotalOrderBasePages(userId, pageSize);
     }
 
     // 주문 상세조회
@@ -145,7 +178,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void modifyOrderAndTransportStatus(List<String> orderIds, OrderStatus orderStatus, TransportStatus transportStatus) {
-
         orderMapper.batchUpdateOrderStatus(orderIds, orderStatus.getStatusCode());
         transportMapper.batchUpdateTransportRequestStatus(orderIds, transportStatus.getStatusCode());
     }
