@@ -73,6 +73,7 @@
             S.NAME AS storeName,
             O.STATUS AS pickupStatus,
             P.IMAGE_URL AS productImg,
+            P.NAME AS productName,
             O.TOTAL_PRICE AS totalPrice,
             B.NAME AS brandName
         FROM ORDERS O
