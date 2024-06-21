@@ -11,6 +11,8 @@ import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
 import com.ite.pickon.response.SimpleResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +63,27 @@ public class OrderController {
             throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
         }
 
-        return new ResponseEntity<>(orderService.findOrderList(storeId, page, PAGE_SIZE, keyword, totalPage), HttpStatus.OK);
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return new ResponseEntity<>(orderService.findOrderList(storeId, pageable, keyword, totalPage), HttpStatus.OK);
+    }
+
+    /**
+     * 마이 주문 내역
+     * [GET] /orders?page={페이지번호}
+     */
+    @GetMapping("/orders")
+    public ResponseEntity<ListResponse> myOrderList(HttpSession session, @RequestParam int page) {
+        Long userId = userService.checkCurrentUser(session);
+        // 전체 페이지 개수
+        int totalPage = orderService.getTotalBasePage(userId, PAGE_SIZE);
+
+        // 전체 페이지 개수를 넘는 요청을 보내면 예외 처리
+        if (page >= totalPage) {
+            throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
+        }
+
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return new ResponseEntity<>(orderService.findMyOrderList(userId, pageable, totalPage), HttpStatus.OK);
     }
 
 

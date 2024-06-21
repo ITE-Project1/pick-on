@@ -84,10 +84,6 @@ public class TransportServiceImpl implements TransportService {
     @Override
     @Transactional
     public void modifyTransportStatus(int fromStoreId) {
-
-        // TODO: SMS
-        // TODO: 해당 지점의 PENDING 상태인
-
         transportMapper.updateStatusByFromStoreId(fromStoreId);
     }
 
