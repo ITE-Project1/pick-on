@@ -83,10 +83,12 @@
 
     <select id="countTotalBasicProductPages" resultType="int">
         SELECT CEIL(count(*) / #{pageSize}) AS totalPages
-        FROM product
+        from product p
+        join brand b on p.brand_id = b.brand_id
         <if test="keyword != null and keyword != ''">
-            where LOWER(name) LIKE '%' || LOWER(#{keyword}) || '%'
-            or LOWER(product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+            where LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(p.product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(b.name) LIKE '%' || LOWER(#{keyword}) || '%'
         </if>
     </select>
 </mapper>
