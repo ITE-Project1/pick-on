@@ -72,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         // 재고 조정
         stockService.updateStock(stockUpdateStore, orderRequest.getProductId(), -orderRequest.getQuantity());
 
-        // TODO: 주문 정보 가져오기
+        // 주문 정보 조회
         OrderResponse orderResponse = orderMapper.selectOrderById(orderRequest.getOrderId());
 
         // 문자 내용 생성

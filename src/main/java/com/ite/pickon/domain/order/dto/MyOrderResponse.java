@@ -22,6 +22,7 @@ public class MyOrderResponse {
     private Date pickupDate;
     private String pickupStatus;
     private String productImg;
+    private String productName;
     private int totalPrice;
     private String brandName;
     private String storeName;

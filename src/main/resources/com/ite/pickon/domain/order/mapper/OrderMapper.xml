@@ -27,26 +27,25 @@
                    #{orderRequest.orderId})
     </insert>
 
-    <!-- 주문 목록 조회 -->
+    <!-- 지점별 주문 목록 조회 -->
     <select id="selectOrderListByStore" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MultiOrderResponse">
         SELECT
-            O.ORDER_ID as orderId,
-            O.QUANTITY as quantity,
-            NVL((SELECT S.NAME
-                FROM TRANSPORT_REQUEST TR
-                JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
-                WHERE TR.ORDER_ID = O.ORDER_ID), '-') as fromStore,
-            CASE
-                WHEN O.STATUS = 2 THEN '대기'
-                WHEN O.STATUS = 0 THEN '배송중'
-                WHEN O.STATUS = 1 THEN '픽업가능'
-                WHEN O.STATUS = 3 THEN '픽업완료'
-            END as pickupStatus
+        O.ORDER_ID as orderId,
+        O.QUANTITY as quantity,
+        NVL(S2.NAME, '-') as fromStore,
+        CASE
+        WHEN O.STATUS = 2 THEN '대기'
+        WHEN O.STATUS = 0 THEN '배송중'
+        WHEN O.STATUS = 1 THEN '픽업가능'
+        WHEN O.STATUS = 3 THEN '픽업완료'
+        END as pickupStatus
         FROM ORDERS O
-            JOIN STORE S ON O.STORE_ID = S.STORE_ID
-            JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+        JOIN STORE S ON O.STORE_ID = S.STORE_ID
+        JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+        LEFT JOIN TRANSPORT_REQUEST TR ON O.ORDER_ID = TR.ORDER_ID
+        LEFT JOIN STORE S2 ON TR.FROM_STORE_ID = S2.STORE_ID
         WHERE O.STORE_ID = #{storeId}
-            AND O.STATUS != 3
+        AND O.STATUS != 3
         <if test="keyword != null and keyword != ''">
             AND (LOWER(O.ORDER_ID) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
@@ -74,6 +73,7 @@
             S.NAME AS storeName,
             O.STATUS AS pickupStatus,
             P.IMAGE_URL AS productImg,
+            P.NAME AS productName,
             O.TOTAL_PRICE AS totalPrice,
             B.NAME AS brandName
         FROM ORDERS O
