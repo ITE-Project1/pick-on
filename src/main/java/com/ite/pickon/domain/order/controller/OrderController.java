@@ -42,8 +42,7 @@ public class OrderController {
     @PostMapping(value="/orders", produces = "application/json; charset=UTF-8")
     public ResponseEntity<SimpleResponse> orderAdd(HttpSession session, @RequestBody OrderRequest orderRequest) {
         System.out.println("Received order request: " + orderRequest);
-
-        //Long userId = userService.checkCurrentUser(session);
+        Long userId = userService.checkCurrentUser(session);
         orderService.addOrder(2L, orderRequest);
         return new ResponseEntity<>(new SimpleResponse("주문이 완료되었습니다."), HttpStatus.OK);
     }
