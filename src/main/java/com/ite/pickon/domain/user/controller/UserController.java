@@ -73,13 +73,13 @@ public class UserController {
         if (bCryptPasswordEncoder.matches(user.getPassword(), password) && userinfo.getStatus() == UserStatus.ACTIVE) {
             // 세션 데이터 저장
             session.setAttribute("userId", userinfo.getUser_id());
-            session.setAttribute("role", userinfo.getRole());
             session.setMaxInactiveInterval(1800);
 
             // 프론트에 넘겨줄 정보 저장
             Map<String, Object> sessionData = new HashMap<>();
             sessionData.put("userId", userinfo.getUser_id());
             sessionData.put("role", userinfo.getRole());
+            sessionData.put("username", user.getUsername());
 
             return ResponseEntity.ok(sessionData);
         } else {
