@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    void addOrder(Long userId, OrderRequest orderRequest);
+    void addOrder(OrderRequest orderRequest);
 
     OrderResponse findOrderDetail(String orderId);
 

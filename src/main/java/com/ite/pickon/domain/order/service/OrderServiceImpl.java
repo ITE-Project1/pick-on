@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -44,30 +43,23 @@ public class OrderServiceImpl implements OrderService {
     // 주문하기 & 재고 요청하기
     @Override
     @Transactional
-    public void addOrder(Long userId, OrderRequest orderRequest) {
+    public void addOrder(OrderRequest orderRequest) {
+        long startTime = System.currentTimeMillis();
+
         // 주문코드 생성
-        orderRequest.setOrderId(generateOrderId(orderRequest.getStoreId()));
+        generateOrderCode(orderRequest);
 
         // 최적의 운송 스케줄 가져오기
-        TransportVO transportVO = null;
-        int stockUpdateStore = orderRequest.getStoreId();
-        if (orderRequest.getDirectPickup() == 0) {
-            transportVO = transportService.findOptimalTransportStore(
-                    orderRequest.getProductId(),
-                    orderRequest.getQuantity(),
-                    orderRequest.getStoreId(),
-                    new Date()
-            );
-        }
+        TransportVO transportVO = determineTransportVO(orderRequest);
 
-        // 주문 생성
-        processOrder(userId, orderRequest, transportVO);
+        // 재고 조정 지점 지정
+        int stockUpdateStore = transportVO != null ? transportVO.getFromStoreId() : orderRequest.getStoreId();
 
-        // 운송 요청 생성
-        if (transportVO != null) {
-            addTransportRequest(orderRequest, transportVO);
-            stockUpdateStore = transportVO.getFromStoreId();
-        }
+        // 바로 픽업 여부에 따른 픽업 예상 날짜, 주문 상태, 상품 운송 출발 지점 결졍
+        setOrderStatusAndPickupDate(orderRequest, transportVO);
+
+        // 주문 및 운송 요청 생성
+        orderMapper.insertOrderAndRequest(orderRequest);
 
         // 재고 조정
         stockService.updateStock(stockUpdateStore, orderRequest.getProductId(), -orderRequest.getQuantity());
@@ -84,35 +76,50 @@ public class OrderServiceImpl implements OrderService {
         );
 
         // 문자 전송
-//        smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
+        smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("프로시저 방식 실행 시간: " + (endTime - startTime) + "ms");
     }
 
     // 주문코드 생성
-    private String generateOrderId(int storeId) {
-        String uuidPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
-        return "PO" + storeId + uuidPart;
+    private void generateOrderCode(OrderRequest orderRequest) {
+        String orderId = "PO" + orderRequest.getStoreId() + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        orderRequest.setOrderId(orderId);
     }
 
-    // 주문 생성
-    private void processOrder(Long userId, OrderRequest orderRequest, TransportVO transportVO) {
+    // 최적의 운송 스케줄
+    private TransportVO determineTransportVO(OrderRequest orderRequest) {
+        if (orderRequest.getDirectPickup() == 0) {
+            return transportService.findOptimalTransportStore(
+                    orderRequest.getProductId(),
+                    orderRequest.getQuantity(),
+                    orderRequest.getStoreId(),
+                    new Date()
+            );
+        }
+        return null;
+    }
+
+    // 픽업 예상 날짜, 주문 상태, 상품 운송 출발 지점 결졍
+    private void setOrderStatusAndPickupDate(OrderRequest orderRequest, TransportVO transportVO) {
         LocalDateTime pickupDate;
         int status;
+        Integer fromStoreId;
         if (orderRequest.getDirectPickup() == 1) {
-            // 바로 픽업 가능한 경우
+            // 바로 픽업
             pickupDate = LocalDateTime.now();
             status = OrderStatus.PICKUPREADY.getStatusCode();
+            fromStoreId = null;
         } else {
-            // 지점 간 상품 운송 필요한 경우
+            // 지점 간 상품 운송
             pickupDate = transportVO.getArrivalTime();
             status = OrderStatus.PENDING.getStatusCode();
+            fromStoreId = transportVO.getFromStoreId();
         }
         orderRequest.setStatus(status);
-        orderMapper.insertOrder(userId, orderRequest, pickupDate);
-    }
-
-    // 운송 요청 생성
-    private void addTransportRequest(OrderRequest orderRequest, TransportVO transportVO) {
-        orderMapper.insertTransportRequest(orderRequest, transportVO.getFromStoreId());
+        orderRequest.setPickupDate(pickupDate);
+        orderRequest.setFromStoreId(fromStoreId);
     }
 
     // 주문 목록 조회
