@@ -13,6 +13,7 @@ import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.domain.transport.dto.TransportVO;
 import com.ite.pickon.domain.transport.mapper.TransportMapper;
 import com.ite.pickon.domain.transport.service.TransportService;
+import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.mapper.UserMapper;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
@@ -185,8 +186,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void modifyOrderAndTransportStatus(List<String> orderIds, OrderStatus orderStatus, TransportStatus transportStatus) {
-        orderMapper.batchUpdateOrderStatus(orderIds, orderStatus.getStatusCode());
-        transportMapper.batchUpdateTransportRequestStatus(orderIds, transportStatus.getStatusCode());
+
+        try {
+            orderMapper.batchUpdateOrderStatus(orderIds, orderStatus.getStatusCode());
+            transportMapper.batchUpdateTransportRequestStatus(orderIds, transportStatus.getStatusCode());
+
+            // 주문 정보 조회
+            List<OrderResponse> orderList = orderMapper.selectOrderListById(orderIds);
+
+            // 각 사용자에게 SMS 전송
+            for (OrderResponse order : orderList) {
+                String message = smsMessageTemplate.getPickUpReadyMessage(
+                        order.getOrderId(),
+                        order.getToStore(),
+                        order.getProductName()
+                );
+                smsService.sendSms(order.getUserPhoneNumber(), message);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

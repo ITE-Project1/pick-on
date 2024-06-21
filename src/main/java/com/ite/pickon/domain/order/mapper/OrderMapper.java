@@ -39,4 +39,7 @@ public interface OrderMapper {
 
     // 주문 상태 일괄 변경
     void batchUpdateOrderStatus(@Param("orderIds") List<String> orderIds, @Param("statusCode") int statusCode);
+
+    // 배송 완료된 주문 목록 조회
+    List<OrderResponse> selectOrderListById(@Param("orderIds") List<String> orderIds);
 }

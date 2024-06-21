@@ -121,4 +121,23 @@
         </foreach>
     </update>
 
+    <!-- 배송 완료된 주문 목록 조회 -->
+    <select id="selectOrderListById" parameterType="list" resultType="com.ite.pickon.domain.order.dto.OrderResponse">
+        SELECT
+            O.ORDER_ID as orderId,
+            S.NAME as toStore,
+            P.NAME as productName,
+            U.PHONE_NUMBER as userPhoneNumber
+        FROM
+            ORDERS O
+            JOIN STORE S ON O.STORE_ID = S.STORE_ID
+            JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+            JOIN USERS U ON O.USER_ID = U.USER_ID
+        WHERE
+            O.ORDER_ID IN
+            <foreach item="orderId" collection="orderIds" open="(" separator="," close=")">
+                #{orderId}
+            </foreach>
+    </select>
+
 </mapper>
