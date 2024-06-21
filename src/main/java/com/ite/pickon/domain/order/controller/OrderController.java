@@ -40,7 +40,7 @@ public class OrderController {
         System.out.println("Received order request: " + orderRequest);
 
         Long userId = userService.checkCurrentUser(session);
-        orderService.addOrder(userId, orderRequest);
+        orderService.addOrder(2L, orderRequest);
         return new ResponseEntity<>(new SimpleResponse("주문이 완료되었습니다."), HttpStatus.OK);
     }
 
