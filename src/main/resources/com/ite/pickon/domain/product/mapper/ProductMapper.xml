@@ -42,12 +42,14 @@
     </select>
 
     <select id="selectProductList" resultType="com.ite.pickon.domain.product.dto.ProductListVO">
-        select p.product_id as productId, p.name as name, p.price as price, p.image_url as imageUrl, b.name as brandName
+        select p.product_id as productId, p.name as name, p.price as price,
+               p.image_url as imageUrl, b.name as brandName
         from product p
         join brand b on p.brand_id = b.brand_id
         <if test="keyword != null and keyword != ''">
             where LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%'
             or LOWER(p.product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(b.name) LIKE '%' || LOWER(#{keyword}) || '%'
         </if>
         order by
         <if test="pageable.sort != null">
@@ -81,10 +83,12 @@
 
     <select id="countTotalBasicProductPages" resultType="int">
         SELECT CEIL(count(*) / #{pageSize}) AS totalPages
-        FROM product
+        from product p
+        join brand b on p.brand_id = b.brand_id
         <if test="keyword != null and keyword != ''">
-            where LOWER(name) LIKE '%' || LOWER(#{keyword}) || '%'
-            or LOWER(product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+            where LOWER(p.name) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(p.product_id) LIKE '%' || LOWER(#{keyword}) || '%'
+            or LOWER(b.name) LIKE '%' || LOWER(#{keyword}) || '%'
         </if>
     </select>
 </mapper>
