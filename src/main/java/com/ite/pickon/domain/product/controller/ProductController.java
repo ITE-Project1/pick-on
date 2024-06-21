@@ -68,9 +68,16 @@ public class ProductController {
     }
 
     @GetMapping("/products/list")
-    public ResponseEntity<List<ProductListVO>> getBasicProductList(@RequestParam int page,
+    public ResponseEntity<ListResponse> getBasicProductList(@RequestParam int page,
                                                                    @RequestParam String sort,
                                                                    @RequestParam(required = false) String keyword) {
+        // 전체 페이지 개수 조회(0부터 시작이라 mapper에서 CEIL로 했음)
+        int totalPage = productService.getTotalProductPage(keyword, PRODUCTS_PAGE_SIZE);
+
+        // 전체 페이지 개수를 넘는 요청을 보내면 예외 처리
+        if (page > totalPage) {
+            throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
+        }
 
         Sort sortOrder = Sort.by("created_at").descending(); //최신순
         if ("priceHigh".equals(sort)) {   //낮은가격순
@@ -81,7 +88,8 @@ public class ProductController {
         }
         page = page - 1;
         Pageable pageable = PageRequest.of(page, 10, sortOrder);
-        return ResponseEntity.ok(productService.getList(pageable, keyword));
+
+        return ResponseEntity.ok(productService.getList(pageable, keyword, totalPage));
     }
 
 }

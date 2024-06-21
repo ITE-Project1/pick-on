@@ -1,17 +1,14 @@
 package com.ite.pickon.domain.order.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderReq {
+@ToString
+public class OrderRequest {
     private String orderId;
     private String productId;
     private int quantity;

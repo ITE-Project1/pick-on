@@ -13,9 +13,11 @@ public interface ProductService {
 
     List<ProductResponse> getDetail(String productId);
 
-    List<ProductListVO> getList(Pageable pageable, String keyword);
+    ListResponse getList(Pageable pageable, String keyword, int totalPage);
 
     int getTotalPage(int storeId, String keyword, int pageSize);
+
+    int getTotalProductPage(String keyword, int pageSize);
 }
 
 

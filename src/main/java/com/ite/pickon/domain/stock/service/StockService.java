@@ -1,6 +1,6 @@
 package com.ite.pickon.domain.stock.service;
 
-import com.ite.pickon.domain.stock.dto.StockReq;
+import com.ite.pickon.domain.stock.dto.StockRequest;
 
 public interface StockService {
 
@@ -8,5 +8,5 @@ public interface StockService {
     void updateStock(int fromStoreId, String productId, int i);
 
     // 재고 생성
-    void addStock(StockReq stockReq);
+    void addStock(StockRequest stockRequest);
 }

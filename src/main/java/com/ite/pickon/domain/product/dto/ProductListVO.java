@@ -13,4 +13,5 @@ public class ProductListVO {
     private String name;
     private int price;
     private String imageUrl;
+    private String brandName;
 }

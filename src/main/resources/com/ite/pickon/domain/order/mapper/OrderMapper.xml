@@ -7,14 +7,14 @@
     <insert id="insertOrder">
         INSERT INTO ORDERS (ORDER_ID, USER_ID, STORE_ID, PRODUCT_ID, PICKUP_DATE, QUANTITY, TOTAL_PRICE, STATUS)
         VALUES (
-                #{orderReq.orderId},
+                #{orderRequest.orderId},
                 #{userId},
-                #{orderReq.storeId},
-                #{orderReq.productId},
+                #{orderRequest.storeId},
+                #{orderRequest.productId},
                 #{pickupDate},
-                #{orderReq.quantity},
-                (SELECT PRICE FROM PRODUCT WHERE PRODUCT_ID = #{orderReq.productId}) * #{orderReq.quantity},
-                #{orderReq.status})
+                #{orderRequest.quantity},
+                (SELECT PRICE FROM PRODUCT WHERE PRODUCT_ID = #{orderRequest.productId}) * #{orderRequest.quantity},
+                #{orderRequest.status})
     </insert>
 
     <!-- 운송 요청 생성 -->
@@ -23,38 +23,77 @@
         VALUES (
                    transport_request_seq.NEXTVAL,
                    #{fromStoreId},
-                   #{orderReq.storeId},
-                   #{orderReq.orderId})
+                   #{orderRequest.storeId},
+                   #{orderRequest.orderId})
     </insert>
 
-    <!-- 주문 목록 조회 -->
-    <select id="selectOrderListByStore" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MultiOrderRes">
+    <!-- 지점별 주문 목록 조회 -->
+    <select id="selectOrderListByStore" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MultiOrderResponse">
         SELECT
-            O.ORDER_ID as orderId,
-            O.QUANTITY as quantity,
-            NVL((SELECT S.NAME
-                FROM TRANSPORT_REQUEST TR
-                JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
-                WHERE TR.ORDER_ID = O.ORDER_ID), '-') as fromStore,
-            CASE
-                WHEN O.STATUS = 2 THEN '대기'
-                WHEN O.STATUS = 0 THEN '배송중'
-                WHEN O.STATUS = 1 THEN '픽업가능'
-                WHEN O.STATUS = 3 THEN '픽업완료'
-            END as pickupStatus
+        O.ORDER_ID as orderId,
+        O.QUANTITY as quantity,
+        NVL(S2.NAME, '-') as fromStore,
+        CASE
+        WHEN O.STATUS = 2 THEN '대기'
+        WHEN O.STATUS = 0 THEN '배송중'
+        WHEN O.STATUS = 1 THEN '픽업가능'
+        WHEN O.STATUS = 3 THEN '픽업완료'
+        END as pickupStatus
         FROM ORDERS O
-            JOIN STORE S ON O.STORE_ID = S.STORE_ID
-            JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+        JOIN STORE S ON O.STORE_ID = S.STORE_ID
+        JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+        LEFT JOIN TRANSPORT_REQUEST TR ON O.ORDER_ID = TR.ORDER_ID
+        LEFT JOIN STORE S2 ON TR.FROM_STORE_ID = S2.STORE_ID
         WHERE O.STORE_ID = #{storeId}
+        AND O.STATUS != 3
         <if test="keyword != null and keyword != ''">
             AND (LOWER(O.ORDER_ID) LIKE '%' || LOWER(#{keyword}) || '%')
         </if>
-        ORDER BY O.CREATED_AT DESC, O.ORDER_ID DESC
-        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+        ORDER BY O.STATUS ASC, O.ORDER_ID ASC
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <!-- 전체 주문 목록 페이지 갯수 조회 -->
+    <select id="countTotalOrderPages" parameterType="hashmap" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM ORDERS O
+        JOIN STORE S ON O.STORE_ID = S.STORE_ID
+        WHERE S.STORE_ID = #{storeId}
+        <if test="keyword != null and keyword != ''">
+            AND (LOWER(O.ORDER_ID) LIKE '%' || LOWER(#{keyword}) || '%')
+        </if>
+    </select>
+
+    <!-- 나의 주문 목록 조회 -->
+    <select id="selectMyOrderList" parameterType="map" resultType="com.ite.pickon.domain.order.dto.MyOrderResponse">
+        SELECT
+            O.ORDER_ID AS orderId,
+            O.CREATED_AT AS orderDate,
+            O.PICKUP_DATE AS pickupDate,
+            S.NAME AS storeName,
+            O.STATUS AS pickupStatus,
+            P.IMAGE_URL AS productImg,
+            P.NAME AS productName,
+            O.TOTAL_PRICE AS totalPrice,
+            B.NAME AS brandName
+        FROM ORDERS O
+                 JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+                 JOIN STORE S ON O.STORE_ID = S.STORE_ID
+                 JOIN BRAND B ON P.BRAND_ID = B.BRAND_ID
+        WHERE O.USER_ID = #{userId}
+        ORDER BY O.CREATED_AT DESC
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <!-- 나의 주문 목록 페이지 갯수 조회 -->
+    <select id="countTotalOrderBasePages" parameterType="hashmap" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM ORDERS
+        WHERE USER_ID = #{userId}
     </select>
 
     <!-- 주문 상세 조회 -->
-    <select id="selectOrderById" parameterType="string" resultType="com.ite.pickon.domain.order.dto.OrderRes">
+    <select id="selectOrderById" parameterType="string" resultType="com.ite.pickon.domain.order.dto.OrderResponse">
         SELECT
             O.ORDER_ID as orderId,
             CAST(O.CREATED_AT AS TIMESTAMP) as orderDate,
@@ -63,21 +102,24 @@
                  FROM TRANSPORT_REQUEST TR
                           JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID
                  WHERE TR.ORDER_ID = O.ORDER_ID), '-') as fromStore,
+            S.NAME as toStore,
             CASE
                 WHEN O.STATUS = 2 THEN '대기'
                 WHEN O.STATUS = 0 THEN '배송중'
                 WHEN O.STATUS = 1 THEN '픽업가능'
                 WHEN O.STATUS = 3 THEN '픽업완료'
                 END as pickupStatus,
-            P.IMAGE_URL as prodcutImg,
+            P.IMAGE_URL as productImg,
             P.NAME as productName,
             O.PRODUCT_ID as productId,
             O.QUANTITY as quantity,
-            O.TOTAL_PRICE as totalPrice
+            O.TOTAL_PRICE as totalPrice,
+            U.PHONE_NUMBER as userPhoneNumber
         FROM
             ORDERS O
                 JOIN STORE S ON O.STORE_ID = S.STORE_ID
                 JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+                JOIN USERS U ON O.USER_ID = U.USER_ID
         WHERE
             O.ORDER_ID = #{orderId}
     </select>

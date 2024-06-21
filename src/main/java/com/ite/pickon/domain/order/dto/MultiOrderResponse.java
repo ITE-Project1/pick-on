@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class MultiOrderRes {
+public class MultiOrderResponse {
     private String orderId;
     private int quantity;
     private String fromStore;

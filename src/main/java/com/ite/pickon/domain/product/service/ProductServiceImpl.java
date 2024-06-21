@@ -42,13 +42,24 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
-    public List<ProductListVO> getList(Pageable pageable, String keyword){
-        return productMapper.selectProductList(pageable, keyword);
+    public ListResponse getList(Pageable pageable, String keyword, int totalPage){
+
+        List<ProductListVO> productList = productMapper.selectProductList(pageable, keyword);
+
+        if (productList.size() == 0) {
+            throw new CustomException(ErrorCode.FIND_FAIL_PRODUCTS);
+        }
+
+        return new ListResponse(productList, totalPage);
     }
 
     @Override
     public int getTotalPage(int storeId, String keyword, int pageSize) {
         return productMapper.countTotalProductPages(storeId, keyword, pageSize);
+    }
+    @Override
+    public int getTotalProductPage(String keyword, int pageSize){
+        return productMapper.countTotalBasicProductPages(keyword, pageSize);
     }
 
     // 상품 ID 생성
