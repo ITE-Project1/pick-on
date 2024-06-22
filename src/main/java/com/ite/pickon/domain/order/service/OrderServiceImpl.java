@@ -44,9 +44,7 @@ public class OrderServiceImpl implements OrderService {
     // 주문하기 & 재고 요청하기
     @Override
     @Transactional
-    public void addOrder(OrderRequest orderRequest) {
-        long startTime = System.currentTimeMillis();
-
+    public OrderResponse addOrder(OrderRequest orderRequest) {
         // 주문코드 생성
         generateOrderCode(orderRequest);
 
@@ -79,8 +77,7 @@ public class OrderServiceImpl implements OrderService {
         // 문자 전송
         smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
 
-        long endTime = System.currentTimeMillis();
-        System.out.println("프로시저 방식 실행 시간: " + (endTime - startTime) + "ms");
+        return orderResponse;
     }
 
     // 주문코드 생성
