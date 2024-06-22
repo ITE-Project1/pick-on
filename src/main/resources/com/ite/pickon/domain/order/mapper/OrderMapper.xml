@@ -76,8 +76,8 @@
     <select id="selectOrderById" parameterType="string" resultType="com.ite.pickon.domain.order.dto.OrderResponse">
         SELECT
             O.ORDER_ID as orderId,
-            CAST(O.CREATED_AT AS TIMESTAMP) as orderDate,
-            CAST(O.PICKUP_DATE AS TIMESTAMP) as pickupDate,
+            O.CREATED_AT as orderDate,
+            O.PICKUP_DATE as pickupDate,
             NVL((SELECT S.NAME
                  FROM TRANSPORT_REQUEST TR
                           JOIN STORE S ON TR.FROM_STORE_ID = S.STORE_ID

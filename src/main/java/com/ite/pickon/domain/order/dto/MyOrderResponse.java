@@ -1,6 +1,8 @@
 package com.ite.pickon.domain.order.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ite.pickon.util.KSTDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,9 +18,9 @@ import java.sql.Date;
 @NoArgsConstructor
 public class MyOrderResponse {
     private String orderId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonSerialize(using = KSTDateSerializer.class)
     private Date orderDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = KSTDateSerializer.class)
     private Date pickupDate;
     private String pickupStatus;
     private String productImg;
