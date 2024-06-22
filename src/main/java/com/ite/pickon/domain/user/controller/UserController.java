@@ -21,6 +21,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,6 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(createErrorMap(bindingResult), HttpStatus.BAD_REQUEST);
         }
-
         try {
             // 사용자 등록
             user.setRole("general");
@@ -59,6 +60,7 @@ public class UserController {
             // 패스워드 인코딩 설정 추가
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             userService.addUser(user);
+
             return ResponseEntity.ok("Registration successful! Please login.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("An error occurred during registration. Please try again.");
@@ -66,15 +68,26 @@ public class UserController {
     }
 
     @PostMapping("/user/login")
-    public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session) {
+    public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session, HttpServletResponse response) {
         UserVO userinfo = userService.findByUsername(user.getUsername());
         String password = userinfo.getPassword();
 
         // 패스워드 일치 및 활성 여부 확인
         if (bCryptPasswordEncoder.matches(user.getPassword(), password) && userinfo.getStatus() == UserStatus.ACTIVE) {
+            // 세션 데이터 저장
             session.setAttribute("userId", userinfo.getUser_id());
             session.setMaxInactiveInterval(1800);
-            return ResponseEntity.ok(new LoginResponse("Login successful!", userinfo.getRole()));
+
+            // 프론트에 넘겨줄 정보 저장
+            Map<String, Object> sessionData = new HashMap<>();
+            sessionData.put("userId", userinfo.getUser_id());
+            sessionData.put("role", userinfo.getRole());
+            sessionData.put("username", user.getUsername());
+
+            // 쿠키 설정
+            String cookieValue = "userId=" + userinfo.getUser_id() + "; Path=/; Max-Age=-1; SameSite=None";
+            response.addHeader("Set-Cookie", cookieValue);
+            return ResponseEntity.ok(sessionData);
         } else {
             return ResponseEntity.status(500).body("An error occurred during login. Please try again.");
         }
