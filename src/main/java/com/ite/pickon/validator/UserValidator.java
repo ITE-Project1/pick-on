@@ -17,8 +17,13 @@ public class UserValidator implements Validator {
     @Override
     public void validate(Object o, Errors errors) {
         UserVO userVO = (UserVO) o;
-
         // 사용자 이름 검증
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty");
+        if (userVO.getName().length() < 2 || userVO.getName().length() > 32) {
+            errors.rejectValue("name", "Size.userForm.name", "사용자 이름은 2자 이상 32자 이하여야 합니다.");
+        }
+
+        // 사용자 아이디 검증
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "NotEmpty");
         if (userVO.getUsername().length() < 3 || userVO.getUsername().length() > 32) {
             errors.rejectValue("username", "Size.userForm.username", "사용자 아이디는 3자 이상 32자 이하이어야 합니다.");
