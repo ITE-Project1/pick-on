@@ -35,9 +35,11 @@
                p.price       as price,
                p.image_url   as imageUrl,
                s.store_id    as storeId,
-               s.quantity    as quantity
+               s.quantity    as quantity,
+               b.name        as brandName
         from product p
                  join stock s on p.product_id = s.product_id
+                 join brand b on p.brand_id = b.brand_id
         where p.product_id LIKE #{productId}
     </select>
 

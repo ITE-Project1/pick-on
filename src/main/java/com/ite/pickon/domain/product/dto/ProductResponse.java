@@ -18,4 +18,5 @@ public class ProductResponse {
     private String imageUrl;
     private int storeId;
     private int quantity;
+    private String brandName;
 }
