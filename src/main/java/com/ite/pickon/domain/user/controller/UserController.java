@@ -1,13 +1,11 @@
 package com.ite.pickon.domain.user.controller;
 
 import com.ite.pickon.domain.user.UserStatus;
-import com.ite.pickon.domain.user.dto.UserAdminVO;
 import com.ite.pickon.domain.user.dto.UserVO;
 import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
-import com.ite.pickon.response.LoginResponse;
 import com.ite.pickon.validator.UserValidator;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -45,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping("/user/register")
-    public ResponseEntity<?> userAdd(@RequestBody UserVO user, BindingResult bindingResult, HttpSession session) {
+    public ResponseEntity<?> userAdd(@RequestBody UserVO user, BindingResult bindingResult) {
         validator.validate(user, bindingResult);
 
         // 입력값 검증 로직 추가
@@ -89,7 +86,8 @@ public class UserController {
             response.addHeader("Set-Cookie", cookieValue);
             return ResponseEntity.ok(sessionData);
         } else {
-            return ResponseEntity.status(500).body("An error occurred during login. Please try again.");
+            // 로그인 실패 시 ErrorCode 반환
+            throw new CustomException(ErrorCode.FAIL_TO_LOGIN);
         }
     }
 
