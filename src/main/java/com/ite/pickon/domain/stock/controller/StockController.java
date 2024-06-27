@@ -17,6 +17,9 @@ public class StockController {
 
     /**
      * 재고 등록
+     *
+     * @param stockRequest 재고 요청 데이터
+     * @return 재고 등록 결과 응답
      */
     @PostMapping(value="/stocks", produces = "application/json; charset=UTF-8")
     public ResponseEntity<SimpleResponse> stockAdd(@RequestBody StockRequest stockRequest) {
