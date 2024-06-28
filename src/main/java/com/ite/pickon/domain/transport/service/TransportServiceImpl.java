@@ -2,8 +2,6 @@ package com.ite.pickon.domain.transport.service;
 
 import com.ite.pickon.domain.stock.dto.StockVO;
 import com.ite.pickon.domain.stock.mapper.StockMapper;
-import com.ite.pickon.domain.transport.TransportInformation;
-import com.ite.pickon.domain.transport.TransportSchedule;
 import com.ite.pickon.domain.transport.dto.TransportInformationVO;
 import com.ite.pickon.domain.transport.dto.TransportScheduleVO;
 import com.ite.pickon.domain.transport.dto.TransportVO;

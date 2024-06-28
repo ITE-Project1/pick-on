@@ -1,10 +1,8 @@
 package com.ite.pickon.domain.transport.schedule;
 
-import com.ite.pickon.domain.transport.TransportSchedule;
 import com.ite.pickon.domain.transport.service.TransportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
