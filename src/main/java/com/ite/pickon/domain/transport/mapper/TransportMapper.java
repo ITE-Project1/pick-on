@@ -1,5 +1,7 @@
 package com.ite.pickon.domain.transport.mapper;
 
+import com.ite.pickon.domain.transport.dto.TransportInformationVO;
+import com.ite.pickon.domain.transport.dto.TransportScheduleVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,4 +30,8 @@ public interface TransportMapper {
      */
     void batchUpdateTransportRequestStatus(@Param("orderIds") List<String> orderIds,
                                            @Param("statusCode") int statusCode);
+
+    List<TransportInformationVO> selectTransportInformation(int toStoreId);
+
+    List<TransportScheduleVO> selectTransportSchedule();
 }

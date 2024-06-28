@@ -4,6 +4,8 @@ import com.ite.pickon.domain.stock.dto.StockVO;
 import com.ite.pickon.domain.stock.mapper.StockMapper;
 import com.ite.pickon.domain.transport.TransportInformation;
 import com.ite.pickon.domain.transport.TransportSchedule;
+import com.ite.pickon.domain.transport.dto.TransportInformationVO;
+import com.ite.pickon.domain.transport.dto.TransportScheduleVO;
 import com.ite.pickon.domain.transport.dto.TransportVO;
 import com.ite.pickon.domain.transport.mapper.TransportMapper;
 import com.ite.pickon.exception.CustomException;
@@ -43,13 +45,17 @@ public class TransportServiceImpl implements TransportService {
         // 주문한 시간과 날짜를 LocalDateTime으로 변환
         LocalDateTime orderDateTime = convertToLocalDateTime(orderDate);
         long minDifference = Long.MAX_VALUE;
-        TransportSchedule optimalSchedule = null;
+        TransportScheduleVO optimalSchedule = null;
         LocalDateTime optimalDepartureDateTime = null;
         LocalDateTime optimalArrivalDateTime = null;
 
         // 모든 배차 시간을 순회하면서 가장 빠른 배차 시간 + 재고 조회
         // 재고, 배차 시간, 운송 시간 총 3가지 요소를 고려
         List<StockVO> stockList = stockMapper.selectStockForStore(productId);
+        List<TransportInformationVO> transportInformationList = transportMapper.selectTransportInformation(storeId);
+        List<TransportScheduleVO> transportScheduleList = transportMapper.selectTransportSchedule();
+        // 배차 시간 정보, 운송 시간 정보도 db에서 가져와야된다.
+
         for (StockVO stockVO : stockList) {
             // 동일한 지점 X
             if (stockVO.getStoreId() == storeId) continue;
@@ -57,23 +63,28 @@ public class TransportServiceImpl implements TransportService {
             // 주문 수량보다 재고가 많아야 함
             if (stockVO.getQuantity() < quantity) continue;
 
-            for (TransportSchedule schedule : TransportSchedule.values()) {
+            for (TransportScheduleVO schedule : transportScheduleList) {
                 // 재고가 확보된 지점과 운송 스케줄에 저장된 지점이 같은지 검증
                 if (schedule.getStoreId() != stockVO.getStoreId()) continue;
 
                 // 배차 시간을 LocalDateTime으로 변환
-                LocalDateTime scheduleDateTime = LocalDateTime.of(orderDateTime.toLocalDate(), schedule.getDepartureTime());
+                LocalDateTime scheduleDateTime = LocalDateTime.of(
+                                                    orderDateTime.getYear(),
+                                                    orderDateTime.getMonth(),
+                                                    orderDateTime.getDayOfMonth(),
+                                                    schedule.getDepartureTime().getHour(),
+                                                    schedule.getDepartureTime().getMinute());
                 if (scheduleDateTime.isBefore(orderDateTime)) {
                     // 배차 시간이 주문 시간 이전이면 다음 날로 설정
                     scheduleDateTime = scheduleDateTime.plusDays(1);
                 }
 
-                for (TransportInformation information : TransportInformation.values()) {
+                for (TransportInformationVO information : transportInformationList) {
                     if (information.getFromStoreId() != stockVO.getStoreId() || information.getToStoreId() != storeId) {
                         continue;
                     }
                     // scheduleDateTime + 해당 지점까지의 운송 시간 계산
-                    LocalDateTime resultDateTime = scheduleDateTime.plusMinutes(information.getTransportMinutes());
+                    LocalDateTime resultDateTime = scheduleDateTime.plusMinutes(information.getTransportTime());
 
                     // 주문 시각으로 부터 가장 빠른 시간 구하기
                     long difference = Duration.between(orderDateTime, resultDateTime).toSeconds();
