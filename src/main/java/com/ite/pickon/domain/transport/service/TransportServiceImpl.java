@@ -65,13 +65,16 @@ public class TransportServiceImpl implements TransportService {
                 // 재고가 확보된 지점과 운송 스케줄에 저장된 지점이 같은지 검증
                 if (schedule.getStoreId() != stockVO.getStoreId()) continue;
 
+                Date departureTimeDate = schedule.getDepartureTime();
+                LocalDateTime departureTime = convertToLocalDateTime(departureTimeDate);
+
                 // 배차 시간을 LocalDateTime으로 변환
                 LocalDateTime scheduleDateTime = LocalDateTime.of(
                                                     orderDateTime.getYear(),
                                                     orderDateTime.getMonth(),
                                                     orderDateTime.getDayOfMonth(),
-                                                    schedule.getDepartureTime().getHour(),
-                                                    schedule.getDepartureTime().getMinute());
+                                                    departureTime.getHour(),
+                                                    departureTime.getMinute());
                 if (scheduleDateTime.isBefore(orderDateTime)) {
                     // 배차 시간이 주문 시간 이전이면 다음 날로 설정
                     scheduleDateTime = scheduleDateTime.plusDays(1);
