@@ -24,4 +24,15 @@
             #{orderId}
         </foreach>
     </update>
+
+    <select id="selectTransportInformation" parameterType="int" resultType="com.ite.pickon.domain.transport.dto.TransportInformationVO">
+        select from_store_id as fromStoreId, to_store_id as toStoreId, transport_time as transportTime
+        from transport_information
+        where to_store_id = #{toStoreId}
+    </select>
+
+    <select id="selectTransportSchedule" resultType="com.ite.pickon.domain.transport.dto.TransportScheduleVO">
+        select store_id as storeId, departure_time as departureTime
+        from transport_schedule
+    </select>
 </mapper>

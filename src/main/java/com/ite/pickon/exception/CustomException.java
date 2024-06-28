@@ -1,7 +1,6 @@
 package com.ite.pickon.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class CustomException extends RuntimeException {
