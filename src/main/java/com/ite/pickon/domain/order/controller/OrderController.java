@@ -37,9 +37,12 @@ public class OrderController {
 
     /**
      * 주문하기
-     * [POST] /orders
+     *
+     * @param session 현재 세션
+     * @param orderRequest 주문 요청 객체
+     * @return 주문 응답 객체를 담은 ResponseEntity
      */
-    @PostMapping(value="/orders", produces = "application/json; charset=UTF-8")
+    @PostMapping(value = "/orders", produces = "application/json; charset=UTF-8")
     public ResponseEntity<OrderResponse> orderAdd(HttpSession session, @RequestBody OrderRequest orderRequest) {
         orderRequest.setUserId(userService.checkCurrentUser(session));
         return ResponseEntity.ok(orderService.addOrder(orderRequest));
@@ -47,7 +50,11 @@ public class OrderController {
 
     /**
      * 지점별 주문 내역 조회
-     * [GET] /admin/orders?storeId={지점인덱스}&page={페이지번호}&keyword={검색키워드}
+     *
+     * @param storeId 지점 인덱스
+     * @param page 페이지 번호
+     * @param keyword 검색 키워드 (선택 사항)
+     * @return 주문 목록을 담은 ResponseEntity
      */
     @GetMapping("/admin/orders")
     public ResponseEntity<ListResponse> orderList(@RequestParam int storeId,
@@ -68,7 +75,10 @@ public class OrderController {
 
     /**
      * 마이 주문 내역
-     * [GET] /orders?page={페이지번호}
+     *
+     * @param session 현재 세션
+     * @param page 페이지 번호
+     * @return 나의 주문 목록을 담은 ResponseEntity
      */
     @GetMapping("/orders")
     public ResponseEntity<ListResponse> myOrderList(HttpSession session, @RequestParam int page) {
@@ -87,8 +97,10 @@ public class OrderController {
     }
 
     /**
-     *  주문 상세조회
-     *  [GET] /admin/orders/:{orderId}
+     * 주문 상세 조회
+     *
+     * @param orderId 주문 ID
+     * @return 주문 상세 정보를 담은 ResponseEntity
      */
     @GetMapping("/admin/orders/{orderId}")
     public ResponseEntity<OrderResponse> orderDetails(@PathVariable String orderId) {
@@ -97,8 +109,10 @@ public class OrderController {
     }
 
     /**
-     *  고객 픽업 완료
-     *  [PATCH] /admin/orders/:{orderId}/status/completed
+     * 고객 픽업 완료로 상태 변경
+     *
+     * @param orderId 주문 ID
+     * @return 단순 응답 메시지를 담은 ResponseEntity
      */
     @PatchMapping(value = "/admin/orders/{orderId}/status/completed", produces = "application/json; charset=UTF-8")
     public ResponseEntity<SimpleResponse> orderCompletedModify(@PathVariable String orderId) {
@@ -107,13 +121,14 @@ public class OrderController {
     }
 
     /**
-     *  지점간 상품 운송 완료
-     *  [PATCH] /admin/orders/status/pickupready
+     * 픽업 준비 완료로 상태 변경
+     *
+     * @param orderIds 주문 ID 목록
+     * @return 단순 응답 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/admin/orders/status/pickupready")
     public ResponseEntity<SimpleResponse> updateOrderStatusToPickupReady(@RequestBody List<String> orderIds) {
         orderService.modifyOrderAndTransportStatus(orderIds, OrderStatus.PICKUPREADY, TransportStatus.COMPLETED);
         return new ResponseEntity<>(new SimpleResponse("지점간 상품 배송이 완료되었습니다."), HttpStatus.OK);
     }
-
 }
