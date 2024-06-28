@@ -7,8 +7,8 @@ import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
 import com.ite.pickon.validator.UserValidator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,20 +27,20 @@ import java.util.Map;
 
 @Log
 @Controller
+@RequiredArgsConstructor
 public class UserController {
     private static final int USER_PAGE_SIZE = 10;
-
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserValidator validator;
 
-    @Autowired
-    public UserController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userService = userService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.validator = new UserValidator();
-    }
-
+    /**
+     * 회원가입 처리
+     *
+     * @param user 사용자 정보 객체
+     * @param bindingResult 입력값 검증 결과
+     * @return 응답 객체
+     */
     @PostMapping("/user/register")
     public ResponseEntity<?> userAdd(@RequestBody UserVO user, BindingResult bindingResult) {
         validator.validate(user, bindingResult);
@@ -64,6 +64,14 @@ public class UserController {
         }
     }
 
+    /**
+     * 로그인 처리
+     *
+     * @param user 사용자 정보 객체
+     * @param session 세션 객체
+     * @param response 응답 객체
+     * @return 응답 객체
+     */
     @PostMapping("/user/login")
     public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session, HttpServletResponse response) {
         UserVO userinfo = userService.findByUsername(user.getUsername());
@@ -91,12 +99,24 @@ public class UserController {
         }
     }
 
+    /**
+     * 로그아웃 처리
+     *
+     * @param session 세션 객체
+     * @return 응답 객체
+     */
     @PostMapping("/user/logout")
     public ResponseEntity<?> userLogout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
     }
 
+    /**
+     * 계정 비활성화 처리
+     *
+     * @param session 세션 객체
+     * @return 응답 객체
+     */
     @PatchMapping("/user/sign-out")
     public ResponseEntity<?> userRemove(HttpSession session) {
         Long userId = userService.checkCurrentUser(session);
@@ -108,6 +128,13 @@ public class UserController {
         return ResponseEntity.ok("User deactivated");
     }
 
+    /**
+     * 사용자 목록 조회 (관리자용)
+     *
+     * @param page 페이지 번호
+     * @param keyword 검색 키워드 (선택 사항)
+     * @return 사용자 목록 응답 객체
+     */
     @GetMapping("/admin/users")
     public ResponseEntity<ListResponse> getUserList(@RequestParam int page,
                                                     @RequestParam(required = false) String keyword) {
@@ -123,12 +150,24 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserList(pageable, keyword, totalPage));
     }
 
+    /**
+     * 사용자 상태 변경 (관리자용)
+     *
+     * @param usernames 상태 변경할 사용자명 목록
+     * @return 응답 메시지
+     */
     @PatchMapping(value = "/admin/users", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> userStatusModify(@RequestBody List<String> usernames) {
         userService.modifyUserListStatus(usernames);
         return ResponseEntity.ok("User blacked");
     }
 
+    /**
+     * 입력값 검증 오류 메시지 생성
+     *
+     * @param bindingResult 입력값 검증 결과
+     * @return Error Message Map 객체
+     */
     private Map<String, String> createErrorMap(BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
         for (FieldError error : bindingResult.getFieldErrors()) {
