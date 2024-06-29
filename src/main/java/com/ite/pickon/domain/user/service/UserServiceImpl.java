@@ -7,18 +7,32 @@ import com.ite.pickon.domain.user.mapper.UserMapper;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
+import com.ite.pickon.security.JwtToken;
+import com.ite.pickon.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final BCryptPasswordEncoder encoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final Set<String> blacklist = new HashSet<>();
 
     /**
      * 회원가입 처리
@@ -103,25 +117,43 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 현재 세션의 사용자 ID 확인
+     * 로그인 처리 및 JWT 토큰 생성
      *
-     * @param session 현재 세션
-     * @return 사용자 ID
-     * @throws CustomException 세션 만료 또는 비회원일 경우 예외 발생
+     * @param username 사용자명
+     * @param password 비밀번호
+     * @param userId 사용자 ID
+     * @return 생성된 JWT 토큰
      */
     @Override
-    public Long checkCurrentUser(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            // 세션이 만료되었을 경우
-            throw new CustomException(ErrorCode.INVALID_SESSION_ID);
-        }
+    public JwtToken login(String username, String password, Long userId) {
 
-        // 현재 로그인 한 유저가 회원인지 확인
-        if (userMapper.selectUserId(userId).equals(userId)) {
-            return userId;
-        } else {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
+        // Authentication 객체 생성
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        // 검증된 인증 정보로 JWT 토큰 생성
+        return jwtTokenProvider.generateToken(authentication, userId);
+
     }
+
+    /**
+     * 토큰을 블랙리스트에 추가
+     *
+     * @param token 블랙리스트에 추가할 토큰
+     */
+    @Override
+    public void addTokenToBlacklist(String token) {
+        blacklist.add(token);
+    }
+
+    /**
+     * 토큰이 블랙리스트에 있는지 확인
+     *
+     * @param token 확인할 토큰
+     * @return 블랙리스트에 포함 여부
+     */
+    @Override
+    public boolean isTokenBlacklisted(String token) {
+        return blacklist.contains(token);
+    }
+
 }

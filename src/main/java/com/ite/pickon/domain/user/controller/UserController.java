@@ -6,6 +6,8 @@ import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
+import com.ite.pickon.security.JwtToken;
+import com.ite.pickon.security.JwtTokenProvider;
 import com.ite.pickon.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -13,14 +15,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class UserController {
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserValidator validator;
+    private JwtTokenProvider jwtTokenProvider;
 
     /**
      * 회원가입 처리
@@ -57,7 +59,6 @@ public class UserController {
             // 패스워드 인코딩 설정 추가
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             userService.addUser(user);
-
             return ResponseEntity.ok("Registration successful! Please login.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("An error occurred during registration. Please try again.");
@@ -68,63 +69,61 @@ public class UserController {
      * 로그인 처리
      *
      * @param user 사용자 정보 객체
-     * @param session 세션 객체
-     * @param response 응답 객체
      * @return 응답 객체
      */
     @PostMapping("/user/login")
-    public ResponseEntity<?> userLogin(@RequestBody UserVO user, HttpSession session, HttpServletResponse response) {
-        UserVO userinfo = userService.findByUsername(user.getUsername());
-        String password = userinfo.getPassword();
-
-        // 패스워드 일치 및 활성 여부 확인
-        if (bCryptPasswordEncoder.matches(user.getPassword(), password) && userinfo.getStatus() == UserStatus.ACTIVE) {
-            // 세션 데이터 저장
-            session.setAttribute("userId", userinfo.getUser_id());
-            session.setMaxInactiveInterval(1800);
-
-            // 프론트에 넘겨줄 정보 저장
-            Map<String, Object> sessionData = new HashMap<>();
-            sessionData.put("userId", userinfo.getUser_id());
-            sessionData.put("role", userinfo.getRole());
-            sessionData.put("username", user.getUsername());
-
-            // 쿠키 설정
-            String cookieValue = "userId=" + userinfo.getUser_id() + "; Path=/; Max-Age=-1; SameSite=None";
-            response.addHeader("Set-Cookie", cookieValue);
-            return ResponseEntity.ok(sessionData);
-        } else {
-            // 로그인 실패 시 ErrorCode 반환
-            throw new CustomException(ErrorCode.FAIL_TO_LOGIN);
+    public ResponseEntity<JwtToken> loginSuccess(@RequestBody UserVO user) {
+        try {
+            UserVO userinfo = userService.findByUsername(user.getUsername());
+            JwtToken token = userService.login(user.getUsername(), user.getPassword(), userinfo.getUser_id());
+            return ResponseEntity.ok(token);
+        } catch(AuthenticationException e) {
+            return ResponseEntity.status(401).build();
         }
+
+    }
+
+    /**
+     * 리프레시 토큰을 이용한 액세스 토큰 갱신
+     *
+     * @param token 리프레시 토큰
+     * @return 새로운 액세스 토큰
+     */
+    @PostMapping("/user/refresh")
+    public ResponseEntity<JwtToken> refresh(@RequestHeader("Authorization") String token) {
+        String refreshToken = token.replace("Bearer ", "");
+        JwtToken newAccessToken = jwtTokenProvider.generateAccessTokenFromRefreshToken(refreshToken);
+        return ResponseEntity.ok(newAccessToken);
     }
 
     /**
      * 로그아웃 처리
      *
-     * @param session 세션 객체
+     * @param token 액세스 토큰
      * @return 응답 객체
      */
     @PostMapping("/user/logout")
-    public ResponseEntity<?> userLogout(HttpSession session) {
-        session.invalidate();
+    public ResponseEntity<?> userLogout(@RequestHeader("Authorization") String token) {
+        String authToken = token.replace("Bearer ", "");
+        userService.addTokenToBlacklist(authToken);
         return ResponseEntity.ok("Logout successful");
     }
 
     /**
      * 계정 비활성화 처리
      *
-     * @param session 세션 객체
+     * @param token 액세스 토큰
      * @return 응답 객체
      */
     @PatchMapping("/user/sign-out")
-    public ResponseEntity<?> userRemove(HttpSession session) {
-        Long userId = userService.checkCurrentUser(session);
+    public ResponseEntity<?> userRemove(@RequestHeader("Authorization") String token) {
+        Long userId = jwtTokenProvider.getUserIdFromToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         userService.modifyUserStatus(userId, UserStatus.INACTIVE);
-        session.invalidate();
+        userService.addTokenToBlacklist(token.replace("Bearer", ""));
         return ResponseEntity.ok("User deactivated");
     }
 

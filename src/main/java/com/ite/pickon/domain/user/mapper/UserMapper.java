@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserMapper {
 
@@ -65,3 +66,4 @@ public interface UserMapper {
      */
     int countTotalUserPages(@Param("keyword") String keyword, @Param("pageSize") int pageSize);
 }
+

@@ -10,18 +10,13 @@ import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
 import com.ite.pickon.response.SimpleResponse;
+import com.ite.pickon.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -31,7 +26,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private static final int PAGE_SIZE = 10;
 
@@ -43,8 +38,8 @@ public class OrderController {
      * @return 주문 응답 객체를 담은 ResponseEntity
      */
     @PostMapping(value = "/orders", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<OrderResponse> orderAdd(HttpSession session, @RequestBody OrderRequest orderRequest) {
-        orderRequest.setUserId(userService.checkCurrentUser(session));
+    public ResponseEntity<OrderResponse> orderAdd(@RequestHeader("Authorization") String token, @RequestBody OrderRequest orderRequest) {
+        orderRequest.setUserId(jwtTokenProvider.getUserIdFromToken(token));
         return ResponseEntity.ok(orderService.addOrder(orderRequest));
     }
 
@@ -81,8 +76,8 @@ public class OrderController {
      * @return 나의 주문 목록을 담은 ResponseEntity
      */
     @GetMapping("/orders")
-    public ResponseEntity<ListResponse> myOrderList(HttpSession session, @RequestParam int page) {
-        Long userId = userService.checkCurrentUser(session);
+    public ResponseEntity<ListResponse> myOrderList(@RequestHeader("Authorization") String token, @RequestParam int page) {
+        Long userId = jwtTokenProvider.getUserIdFromToken(token);
 
         // 전체 페이지 개수
         int totalPage = orderService.getTotalBasePage(userId, PAGE_SIZE);
