@@ -3,7 +3,7 @@ root-context.xml
 tmp/
 *.tmp
 *.idea
-.env
+/src/main/java/com/ite/pickon/config/secret/
 
 # Created by https://www.toptal.com/developers/gitignore/api/eclipse,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=eclipse,java
