@@ -3,7 +3,7 @@ root-context.xml
 tmp/
 *.tmp
 *.idea
-src/main/resources/.env
+src/main/resources/
 
 # Created by https://www.toptal.com/developers/gitignore/api/eclipse,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=eclipse,java
