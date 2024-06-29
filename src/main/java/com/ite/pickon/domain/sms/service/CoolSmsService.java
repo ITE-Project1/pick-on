@@ -1,5 +1,6 @@
 package com.ite.pickon.domain.sms.service;
 
+import com.ite.pickon.config.EnvConfig;
 import com.ite.pickon.exception.CustomException;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.sdk.NurigoApp;
@@ -17,16 +18,13 @@ import static com.ite.pickon.exception.ErrorCode.FAIL_SUBMIT_SMS;
 public class CoolSmsService implements SmsService {
 
     // CoolSMS API 키
-    @Value("${coolsms.api_key}")
-    private String apiKey;
+    private final String apiKey = EnvConfig.getEnv("COOLSMS_API_KEY");
 
     // CoolSMS API 시크릿 키
-    @Value("${coolsms.api_secret}")
-    private String apiSecret;
+    private final String apiSecret = EnvConfig.getEnv("COOLSMS_API_SECRET");
 
     // 발신자 전화번호
-    @Value("${coolsms.from_phone}")
-    private String fromPhone;
+    private final String fromPhone = EnvConfig.getEnv("COOLSMS_FROM_PHONE");
 
     /**
      * SMS 메시지를 전송하는 메서드

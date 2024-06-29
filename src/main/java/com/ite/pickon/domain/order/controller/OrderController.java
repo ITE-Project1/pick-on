@@ -33,7 +33,7 @@ public class OrderController {
     /**
      * 주문하기
      *
-     * @param session 현재 세션
+     * @param token 현재 세션
      * @param orderRequest 주문 요청 객체
      * @return 주문 응답 객체를 담은 ResponseEntity
      */
@@ -71,7 +71,7 @@ public class OrderController {
     /**
      * 마이 주문 내역
      *
-     * @param session 현재 세션
+     * @param token 현재 세션
      * @param page 페이지 번호
      * @return 나의 주문 목록을 담은 ResponseEntity
      */
