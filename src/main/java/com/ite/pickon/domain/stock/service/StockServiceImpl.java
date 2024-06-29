@@ -16,19 +16,6 @@ public class StockServiceImpl implements StockService {
     private final StockMapper stockMapper;
 
     /**
-     * 재고 수량 업데이트
-     *
-     * @param storeId       재고를 업데이트할 지점의 ID
-     * @param productId     재고를 업데이트할 상품의 ID
-     * @param quantityChange 변경할 재고 수량 (양수: 증가, 음수: 감소)
-     */
-    @Override
-    @Transactional
-    public void updateStock(int storeId, String productId, int quantityChange) {
-        stockMapper.updateStockQuantity(storeId, productId, quantityChange);
-    }
-
-    /**
      * 재고 추가
      *
      * @param stockRequest 생성할 재고의 요청 데이터

@@ -62,9 +62,6 @@ public class OrderServiceImpl implements OrderService {
         // 주문 및 운송 요청 생성
         orderMapper.insertOrderAndRequest(orderRequest);
 
-        // 재고 조정
-        stockService.updateStock(stockUpdateStore, orderRequest.getProductId(), -orderRequest.getQuantity());
-
         // 주문 정보 조회
         OrderResponse orderResponse = orderMapper.selectOrderById(orderRequest.getOrderId());
 
