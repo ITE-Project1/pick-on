@@ -59,8 +59,12 @@ public class OrderServiceImpl implements OrderService {
         // 바로 픽업 여부에 따른 픽업 예상 날짜, 주문 상태, 상품 운송 출발 지점 결정
         setOrderStatusAndPickupDate(orderRequest, transportVO);
 
-        // (1)주문, (2)재고수량조절, {(3)운송요청생성} Stored Procedure 실행
-        orderMapper.insertOrderAndRequest(orderRequest);
+       try {
+           // (1)주문, (2)재고수량조절, {(3)운송요청생성} Stored Procedure 실행
+           orderMapper.insertOrderAndRequest(orderRequest);
+       } catch (Exception e) {
+           throw new CustomException(ErrorCode.FAIL_ORDER);
+       }
 
         // 주문 정보 조회
         OrderResponse orderResponse = orderMapper.selectOrderById(orderRequest.getOrderId());
