@@ -1,11 +1,10 @@
 package com.ite.pickon.domain.order.controller;
 
 import com.ite.pickon.domain.order.OrderStatus;
-import com.ite.pickon.domain.order.dto.OrderRequest;
-import com.ite.pickon.domain.order.dto.OrderResponse;
+import com.ite.pickon.domain.order.dto.OrderVO;
+import com.ite.pickon.domain.order.dto.OrderInfoVO;
 import com.ite.pickon.domain.order.service.OrderService;
 import com.ite.pickon.domain.transport.TransportStatus;
-import com.ite.pickon.domain.user.service.UserService;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -34,13 +32,13 @@ public class OrderController {
      * 주문하기
      *
      * @param token 현재 세션
-     * @param orderRequest 주문 요청 객체
+     * @param orderVO 주문 요청 객체
      * @return 주문 응답 객체를 담은 ResponseEntity
      */
     @PostMapping(value = "/orders", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<OrderResponse> orderAdd(@RequestHeader("Authorization") String token, @RequestBody OrderRequest orderRequest) {
-        orderRequest.setUserId(jwtTokenProvider.getUserIdFromToken(token));
-        return ResponseEntity.ok(orderService.addOrder(orderRequest));
+    public ResponseEntity<OrderInfoVO> orderAdd(@RequestHeader("Authorization") String token, @RequestBody OrderVO orderVO) {
+        orderVO.setUserId(jwtTokenProvider.getUserIdFromToken(token));
+        return ResponseEntity.ok(orderService.addOrder(orderVO));
     }
 
     /**
@@ -98,9 +96,9 @@ public class OrderController {
      * @return 주문 상세 정보를 담은 ResponseEntity
      */
     @GetMapping("/admin/orders/{orderId}")
-    public ResponseEntity<OrderResponse> orderDetails(@PathVariable String orderId) {
-        OrderResponse orderResponse = orderService.findOrderDetail(orderId);
-        return new ResponseEntity<>(orderResponse, HttpStatus.OK);
+    public ResponseEntity<OrderInfoVO> orderDetails(@PathVariable String orderId) {
+        OrderInfoVO orderInfoVO = orderService.findOrderDetail(orderId);
+        return new ResponseEntity<>(orderInfoVO, HttpStatus.OK);
     }
 
     /**

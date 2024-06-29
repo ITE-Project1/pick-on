@@ -1,10 +1,8 @@
 package com.ite.pickon.domain.order.service;
 
 import com.ite.pickon.domain.order.OrderStatus;
-import com.ite.pickon.domain.order.dto.MultiOrderResponse;
-import com.ite.pickon.domain.order.dto.MyOrderResponse;
-import com.ite.pickon.domain.order.dto.OrderRequest;
-import com.ite.pickon.domain.order.dto.OrderResponse;
+import com.ite.pickon.domain.order.dto.OrderVO;
+import com.ite.pickon.domain.order.dto.OrderInfoVO;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
 import com.ite.pickon.domain.sms.service.SmsService;
 import com.ite.pickon.domain.sms.template.SmsMessageTemplate;
@@ -41,70 +39,70 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 주문 생성 및 재고 요청 처리
      *
-     * @param orderRequest 주문 요청 객체
+     * @param orderVO 주문 요청 객체
      * @return 생성된 주문에 대한 응답 객체
      */
     @Override
     @Transactional
-    public OrderResponse addOrder(OrderRequest orderRequest) {
+    public OrderInfoVO addOrder(OrderVO orderVO) {
         // 주문코드 생성
-        generateOrderCode(orderRequest);
+        generateOrderCode(orderVO);
 
         // 최적의 운송 스케줄 가져오기
-        TransportVO transportVO = determineTransportVO(orderRequest);
+        TransportVO transportVO = determineTransportVO(orderVO);
 
         // 재고 조정 지점 지정
-        int stockUpdateStore = transportVO != null ? transportVO.getFromStoreId() : orderRequest.getStoreId();
+        int stockUpdateStore = transportVO != null ? transportVO.getFromStoreId() : orderVO.getStoreId();
 
         // 바로 픽업 여부에 따른 픽업 예상 날짜, 주문 상태, 상품 운송 출발 지점 결정
-        setOrderStatusAndPickupDate(orderRequest, transportVO);
+        setOrderStatusAndPickupDate(orderVO, transportVO);
 
        try {
            // (1)주문, (2)재고수량조절, {(3)운송요청생성} Stored Procedure 실행
-           orderMapper.insertOrderAndRequest(orderRequest);
+           orderMapper.insertOrderAndRequest(orderVO);
        } catch (Exception e) {
            throw new CustomException(ErrorCode.FAIL_ORDER);
        }
 
         // 주문 정보 조회
-        OrderResponse orderResponse = orderMapper.selectOrderById(orderRequest.getOrderId());
+        OrderInfoVO orderInfoVO = orderMapper.selectOrderById(orderVO.getOrderId());
 
         // 문자 내용 생성
         String message = smsMessageTemplate.getOrderCompletionMessage(
-                orderRequest.getOrderId(),
-                orderRequest.getDirectPickup() == 1 ? "즉시 가능" : transportVO.getArrivalTime().toString(),
-                orderResponse.getToStore(),
-                orderResponse.getProductName()
+                orderVO.getOrderId(),
+                orderVO.getDirectPickup() == 1 ? "즉시 가능" : transportVO.getArrivalTime().toString(),
+                orderInfoVO.getToStore(),
+                orderInfoVO.getProductName()
         );
 
         // 문자 전송
-        smsService.sendSms(orderResponse.getUserPhoneNumber(), message);
+//        smsService.sendSms(orderInfoVO.getUserPhoneNumber(), message);
 
-        return orderResponse;
+        return orderInfoVO;
     }
 
     /**
      * 주문코드 생성
      *
-     * @param orderRequest 주문 요청 객체
+     * @param orderVO 주문 요청 객체
      */
-    private void generateOrderCode(OrderRequest orderRequest) {
-        String orderId = "PO" + orderRequest.getStoreId() + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
-        orderRequest.setOrderId(orderId);
+    private void generateOrderCode(OrderVO orderVO) {
+        String orderId = "PO" + orderVO.getStoreId() + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        orderVO.setOrderId(orderId);
     }
 
     /**
      * 최적의 운송 스케줄 결정
      *
-     * @param orderRequest 주문 요청 객체
+     * @param orderVO 주문 요청 객체
      * @return 최적의 운송 정보 객체
      */
-    private TransportVO determineTransportVO(OrderRequest orderRequest) {
-        if (orderRequest.getDirectPickup() == 0) {
+    private TransportVO determineTransportVO(OrderVO orderVO) {
+        if (orderVO.getDirectPickup() == 0) {
             return transportService.findOptimalTransportStore(
-                    orderRequest.getProductId(),
-                    orderRequest.getQuantity(),
-                    orderRequest.getStoreId(),
+                    orderVO.getProductId(),
+                    orderVO.getQuantity(),
+                    orderVO.getStoreId(),
                     new Date()
             );
         }
@@ -114,14 +112,14 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 픽업 예상 날짜, 주문 상태, 상품 운송 출발 지점 결정
      *
-     * @param orderRequest 주문 요청 객체
+     * @param orderVO 주문 요청 객체
      * @param transportVO 운송 정보 객체
      */
-    private void setOrderStatusAndPickupDate(OrderRequest orderRequest, TransportVO transportVO) {
+    private void setOrderStatusAndPickupDate(OrderVO orderVO, TransportVO transportVO) {
         LocalDateTime pickupDate;
         int status;
         Integer fromStoreId;
-        if (orderRequest.getDirectPickup() == 1) {
+        if (orderVO.getDirectPickup() == 1) {
             // 바로 픽업
             pickupDate = LocalDateTime.now();
             status = OrderStatus.PICKUPREADY.getStatusCode();
@@ -132,9 +130,9 @@ public class OrderServiceImpl implements OrderService {
             status = OrderStatus.PENDING.getStatusCode();
             fromStoreId = transportVO.getFromStoreId();
         }
-        orderRequest.setStatus(status);
-        orderRequest.setPickupDate(pickupDate);
-        orderRequest.setFromStoreId(fromStoreId);
+        orderVO.setStatus(status);
+        orderVO.setPickupDate(pickupDate);
+        orderVO.setFromStoreId(fromStoreId);
     }
 
     /**
@@ -149,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public ListResponse findOrderList(int storeId, Pageable pageable, String keyword, int totalPage) {
-        List<MultiOrderResponse> orderList =  orderMapper.selectOrderListByStore(storeId, pageable, keyword);
+        List<OrderInfoVO> orderList =  orderMapper.selectOrderListByStore(storeId, pageable, keyword);
         if(orderList.size() == 0) {
             throw  new CustomException(ErrorCode.FIND_FAIL_ORDERS);
         }
@@ -180,7 +178,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ListResponse findMyOrderList(Long userId, Pageable pageable, int totalPage) {
         try {
-            List<MyOrderResponse> orderList =  orderMapper.selectMyOrderList(userId, pageable);
+            List<OrderInfoVO> orderList =  orderMapper.selectMyOrderList(userId, pageable);
             if(orderList.size() == 0) {
                 throw  new CustomException(ErrorCode.FIND_FAIL_ORDERS);
             }
@@ -211,8 +209,8 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional
-    public OrderResponse findOrderDetail(String orderId) {
-        OrderResponse order = orderMapper.selectOrderById(orderId);
+    public OrderInfoVO findOrderDetail(String orderId) {
+        OrderInfoVO order = orderMapper.selectOrderById(orderId);
         if (order == null) {
             throw new CustomException(FIND_FAIL_ORDER_ID);
         }
@@ -250,10 +248,10 @@ public class OrderServiceImpl implements OrderService {
             transportMapper.batchUpdateTransportRequestStatus(orderIds, transportStatus.getStatusCode());
 
             // 주문 정보 조회
-            List<OrderResponse> orderList = orderMapper.selectOrderListById(orderIds);
+            List<OrderInfoVO> orderList = orderMapper.selectOrderListById(orderIds);
 
             // 각 사용자에게 SMS 전송
-            for (OrderResponse order : orderList) {
+            for (OrderInfoVO order : orderList) {
                 String message = smsMessageTemplate.getPickUpReadyMessage(
                         order.getOrderId(),
                         order.getToStore(),
