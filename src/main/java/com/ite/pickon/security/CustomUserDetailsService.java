@@ -1,26 +1,50 @@
 package com.ite.pickon.security;
 
-package com.ite.pickon.service;
-
+import com.ite.pickon.domain.user.dto.UserVO;
+import com.ite.pickon.domain.user.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.util.Collections;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
+    private final UserMapper userMapper;
+
+    /**
+     * 주어진 사용자 이름으로 사용자 정보 로드
+     *
+     * @param username 사용자 이름
+     * @return UserDetails 객체
+     * @throws UsernameNotFoundException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 이 예제에서는 사용자를 하드코딩하여 반환
-        // 실제로는 데이터베이스에서 사용자를 조회해야 함
-        if ("yjpark".equals(username)) {
-            return new User("yjpark", "$2a$10$DowJones/Q32FAR2nY0mDf.eaxjZ0s1nY48D68E1U7G6dXxAopN2lC", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
-        }
-        throw new UsernameNotFoundException("User not found with username: " + username);
+        System.out.println("hi!!!!!!");
+        UserVO user = Optional.ofNullable(userMapper.selectUser(username))
+                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
+
+        System.out.println("user = " + user);
+        System.out.println("UserDetails = " + createUserDetails(user));
+        return createUserDetails(user);
+    }
+
+    /**
+     * UserVO 객체를 UserDetails 객체로 변환
+     *
+     * @param user UserVO 객체
+     * @return UserDetails 객체
+     */
+    private UserDetails createUserDetails(UserVO user) {
+        return User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole())
+                .build();
     }
 }
