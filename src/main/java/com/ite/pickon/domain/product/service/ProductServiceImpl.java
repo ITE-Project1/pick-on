@@ -59,8 +59,8 @@ public class ProductServiceImpl implements ProductService {
      * @return 상품 상세 정보 리스트
      */
     @Override
-    public List<ProductInfo> getDetail(String productId) {
-        List<ProductInfo> result = productMapper.selectProductDetail(productId);
+    public List<ProductInfoVO> getDetail(String productId) {
+        List<ProductInfoVO> result = productMapper.selectProductDetail(productId);
         return result;
     }
 

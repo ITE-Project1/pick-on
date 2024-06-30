@@ -11,7 +11,7 @@ public interface ProductService {
     ListResponse findProductList(int storeId, Pageable pageable, String keyword, int totalPage);
     boolean addProduct(ProductVO productVO);
 
-    List<ProductInfo> getDetail(String productId);
+    List<ProductInfoVO> getDetail(String productId);
 
     ListResponse getList(Pageable pageable, String keyword, int totalPage);
 

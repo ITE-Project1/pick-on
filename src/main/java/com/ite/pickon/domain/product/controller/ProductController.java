@@ -1,6 +1,6 @@
 package com.ite.pickon.domain.product.controller;
 
-import com.ite.pickon.domain.product.dto.ProductInfo;
+import com.ite.pickon.domain.product.dto.ProductInfoVO;
 import com.ite.pickon.domain.product.dto.ProductVO;
 import com.ite.pickon.domain.product.service.ProductService;
 import com.ite.pickon.exception.CustomException;
@@ -79,7 +79,7 @@ public class ProductController {
      * @return 상품 상세 정보
      */
     @GetMapping("/products/detail/{productId}")
-    public ResponseEntity<List<ProductInfo>> getProductDetail(@PathVariable String productId) {
+    public ResponseEntity<List<ProductInfoVO>> getProductDetail(@PathVariable String productId) {
         return ResponseEntity.ok(productService.getDetail(productId));
     }
 
