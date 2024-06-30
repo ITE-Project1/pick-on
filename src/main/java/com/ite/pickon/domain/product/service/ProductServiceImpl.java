@@ -40,14 +40,15 @@ public class ProductServiceImpl implements ProductService {
     /**
      * 상품 등록
      *
-     * @param productRequest 상품 요청 DTO
+     * @param productVO 상품 요청 DTO
      * @return 상품 등록 성공 여부
      */
     @Transactional
-    public boolean addProduct(ProductRequest productRequest) {
-        String brandInitial = productMapper.selectBrandInitialByBrandId(productRequest.getBrandId());
+    public boolean addProduct(ProductVO productVO) {
+        String brandInitial = productMapper.selectBrandInitialByBrandId(productVO.getBrandId());
         String productId = generateProductId(brandInitial);
-        int updateCnt = productMapper.insertNewProduct(ProductVO.of(productRequest, productId));
+        productVO.setProductId(productId);
+        int updateCnt = productMapper.insertNewProduct(productVO);
         return updateCnt == 1;
     }
 
@@ -58,8 +59,8 @@ public class ProductServiceImpl implements ProductService {
      * @return 상품 상세 정보 리스트
      */
     @Override
-    public List<ProductResponse> getDetail(String productId) {
-        List<ProductResponse> result = productMapper.selectProductDetail(productId);
+    public List<ProductInfo> getDetail(String productId) {
+        List<ProductInfo> result = productMapper.selectProductDetail(productId);
         return result;
     }
 

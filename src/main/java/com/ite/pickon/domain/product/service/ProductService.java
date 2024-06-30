@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ProductService {
     ListResponse findProductList(int storeId, Pageable pageable, String keyword, int totalPage);
-    boolean addProduct(ProductRequest productRequest);
+    boolean addProduct(ProductVO productVO);
 
-    List<ProductResponse> getDetail(String productId);
+    List<ProductInfo> getDetail(String productId);
 
     ListResponse getList(Pageable pageable, String keyword, int totalPage);
 

@@ -1,8 +1,7 @@
 package com.ite.pickon.domain.product.controller;
 
-import com.ite.pickon.domain.product.dto.ProductListVO;
-import com.ite.pickon.domain.product.dto.ProductRequest;
-import com.ite.pickon.domain.product.dto.ProductResponse;
+import com.ite.pickon.domain.product.dto.ProductInfo;
+import com.ite.pickon.domain.product.dto.ProductVO;
 import com.ite.pickon.domain.product.service.ProductService;
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
@@ -15,9 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,12 +58,12 @@ public class ProductController {
     /**
      * 상품 등록
      *
-     * @param productRequest 상품 요청 DTO
+     * @param productVO 상품 요청 DTO
      * @return 상품 등록 결과 메시지
      */
     @PostMapping("/products/register")
-    public ResponseEntity<SimpleResponse> createProduct(@RequestBody ProductRequest productRequest) {
-        boolean isRegistered = productService.addProduct(productRequest);
+    public ResponseEntity<SimpleResponse> createProduct(@RequestBody ProductVO productVO) {
+        boolean isRegistered = productService.addProduct(productVO);
 
         if (isRegistered) {
             return ResponseEntity.ok(new SimpleResponse("상품 등록이 완료되었습니다."));
@@ -82,7 +79,7 @@ public class ProductController {
      * @return 상품 상세 정보
      */
     @GetMapping("/products/detail/{productId}")
-    public ResponseEntity<List<ProductResponse>> getProductDetail(@PathVariable String productId) {
+    public ResponseEntity<List<ProductInfo>> getProductDetail(@PathVariable String productId) {
         return ResponseEntity.ok(productService.getDetail(productId));
     }
 
