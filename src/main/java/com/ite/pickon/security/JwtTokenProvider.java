@@ -1,5 +1,6 @@
 package com.ite.pickon.security;
 
+import com.ite.pickon.config.EnvConfig;
 import com.ite.pickon.domain.user.service.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -31,11 +32,12 @@ public class JwtTokenProvider {
     /**
      * JwtTokenProvider 생성자
      *
-     * @param secretKey   비밀 키
      * @param userService 사용자 서비스 객체
      */
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, @Lazy UserService userService) {
-        byte[] secretByteKey = DatatypeConverter.parseBase64Binary("fske256d3433kf2@er454ddd!35435rd!!!dkzfefdsdfjldkjf!dxfd5dsfx2432dszdfdsfsfs12xdfds2sa");
+    public JwtTokenProvider(@Lazy UserService userService) {
+        // Secret 키
+        String secretKey = EnvConfig.getEnv("JWT_SECRET_KEY");
+        byte[] secretByteKey = DatatypeConverter.parseBase64Binary(secretKey);
         this.key = Keys.hmacShaKeyFor(secretByteKey);
         this.userService = userService;
     }
