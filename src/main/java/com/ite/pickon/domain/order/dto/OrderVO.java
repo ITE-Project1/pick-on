@@ -1,21 +1,23 @@
 package com.ite.pickon.domain.order.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class OrderVO {
-    private String orderId;
     private Long userId;
-    private Long storeId;
+    private String orderId;
     private String productId;
-    private LocalDateTime pickupDate;
     private int quantity;
-    private double totalPrice;
+    private int storeId;            // 픽업 지점
+    private Integer fromStoreId;        // 지점 간 상품 운송이 있을 시, 상품 배송 시작 지점
+    private int directPickup;
     private int status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime pickupDate;
 }

@@ -18,6 +18,7 @@ public enum ErrorCode {
     FAIL_TO_LOGIN(400, "로그인 정보가 일치하지 않습니다. 다시 로그인해주세요."),
     FAIL_SUBMIT_SMS(400, "메시지 발송 접수에 실패했습니다."),
     FAIL_SEND_SMS(400, "문자 메시지 전송에 실패했습니다."),
+    FAIL_ORDER(400, "상품 주문에 실패했습니다."),
     FIND_FAIL_ORDER_ID(400, "존재하지 않는 주문입니다.");
 
     private final int status;

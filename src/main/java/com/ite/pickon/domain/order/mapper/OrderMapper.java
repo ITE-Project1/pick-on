@@ -1,9 +1,7 @@
 package com.ite.pickon.domain.order.mapper;
 
-import com.ite.pickon.domain.order.dto.MultiOrderResponse;
-import com.ite.pickon.domain.order.dto.MyOrderResponse;
-import com.ite.pickon.domain.order.dto.OrderRequest;
-import com.ite.pickon.domain.order.dto.OrderResponse;
+import com.ite.pickon.domain.order.dto.OrderVO;
+import com.ite.pickon.domain.order.dto.OrderInfoVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
@@ -14,9 +12,9 @@ public interface OrderMapper {
     /**
      * 주문 생성 및 지점 간 운송 요청 생성
      *
-     * @param orderRequest 주문 요청 객체
+     * @param orderVO 주문 요청 객체
      */
-    void insertOrderAndRequest(OrderRequest orderRequest);
+    void insertOrderAndRequest(OrderVO orderVO);
 
     /**
      * 지점별 주문 목록 조회
@@ -26,7 +24,7 @@ public interface OrderMapper {
      * @param keyword 검색 키워드
      * @return 지점별 주문 목록
      */
-    List<MultiOrderResponse> selectOrderListByStore(@Param("storeId") int storeId,
+    List<OrderInfoVO> selectOrderListByStore(@Param("storeId") int storeId,
                                                     @Param("pageable") Pageable pageable,
                                                     @Param("keyword") String keyword);
 
@@ -49,7 +47,7 @@ public interface OrderMapper {
      * @param pageable 페이징 정보
      * @return 나의 주문 목록
      */
-    List<MyOrderResponse> selectMyOrderList(@Param("userId") Long userId, @Param("pageable") Pageable pageable);
+    List<OrderInfoVO> selectMyOrderList(@Param("userId") Long userId, @Param("pageable") Pageable pageable);
 
     /**
      * 나의 주문 목록 페이지 갯수 조회
@@ -66,7 +64,7 @@ public interface OrderMapper {
      * @param orderId 주문 ID
      * @return 주문 상세 정보
      */
-    OrderResponse selectOrderById(@Param("orderId") String orderId);
+    OrderInfoVO selectOrderById(@Param("orderId") String orderId);
 
     /**
      * 주문 상태 변경
@@ -91,5 +89,5 @@ public interface OrderMapper {
      * @param orderIds 주문 ID 목록
      * @return 배송 완료된 주문 목록
      */
-    List<OrderResponse> selectOrderListById(@Param("orderIds") List<String> orderIds);
+    List<OrderInfoVO> selectOrderListById(@Param("orderIds") List<String> orderIds);
 }

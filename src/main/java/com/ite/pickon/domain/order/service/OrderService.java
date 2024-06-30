@@ -1,8 +1,8 @@
 package com.ite.pickon.domain.order.service;
 
 import com.ite.pickon.domain.order.OrderStatus;
-import com.ite.pickon.domain.order.dto.OrderRequest;
-import com.ite.pickon.domain.order.dto.OrderResponse;
+import com.ite.pickon.domain.order.dto.OrderVO;
+import com.ite.pickon.domain.order.dto.OrderInfoVO;
 import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.response.ListResponse;
 import org.springframework.data.domain.Pageable;
@@ -11,9 +11,9 @@ import java.util.List;
 
 public interface OrderService {
 
-    OrderResponse addOrder(OrderRequest orderRequest);
+    OrderInfoVO addOrder(OrderVO orderVO);
 
-    OrderResponse findOrderDetail(String orderId);
+    OrderInfoVO findOrderDetail(String orderId);
 
     void modifyOrderStatus(String orderId, OrderStatus completed);
 
