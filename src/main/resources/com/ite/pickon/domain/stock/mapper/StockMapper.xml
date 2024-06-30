@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ite.pickon.domain.stock.mapper.StockMapper">
+    <!-- 지점별 상품 재고 조회 -->
+    <select id="selectStockForStore" resultType="com.ite.pickon.domain.stock.dto.StockVO">
+        SELECT store_id, quantity
+        FROM stock
+        WHERE product_id LIKE #{productId}
+    </select>
+
+    <!-- 재고 생성 -->
+    <insert id="insertStock">
+        INSERT INTO STOCK (STORE_ID, PRODUCT_ID, QUANTITY)
+        VALUES (#{storeId},
+                #{productId},
+                #{quantity})
+    </insert>
+
+    <!-- 해당 지점에 상품 존재 여부 확인 -->
+    <select id="checkStockExists" resultType="int">
+        SELECT COUNT(*)
+        FROM STOCK
+        WHERE STORE_ID = #{storeId}
+          AND PRODUCT_ID = #{productId}
+    </select>
+</mapper>

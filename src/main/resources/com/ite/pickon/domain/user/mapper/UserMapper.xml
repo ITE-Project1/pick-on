@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ite.pickon.domain.user.mapper.UserMapper">
+    <insert id="insertUser" parameterType="com.ite.pickon.domain.user.dto.UserVO">
+        INSERT INTO USERS (USER_ID, NAME, USERNAME, PASSWORD, PHONE_NUMBER, ROLE)
+        VALUES (USER_SEQ.NEXTVAL, #{name}, #{username}, #{password}, #{phone_number}, #{role})
+    </insert>
+
+    <select id="selectUserId" resultType="Long">
+        SELECT USER_ID
+        FROM USERS
+        WHERE USER_ID = ${user_id}
+    </select>
+
+    <select id="selectUserIdByUsername">
+        SELECT USER_ID
+        FROM USERS
+        WHERE USERNAME = #{username}
+    </select>
+    <select id="selectUser" resultType="UserVO">
+        SELECT USER_ID, NAME, USERNAME, PASSWORD, PHONE_NUMBER, ROLE,
+            CASE
+               WHEN STATUS = 0 THEN 'ACTIVE'
+               WHEN STATUS = 1 THEN 'INACTIVE'
+               WHEN STATUS = 2 THEN 'BLACK'
+            END as status
+        FROM USERS WHERE USERNAME = #{username}
+    </select>
+
+    <select id="selectUserListByKeyword" parameterType="hashmap" resultType="com.ite.pickon.domain.user.dto.UserAdminVO">
+        SELECT username, created_at as createdAt, status
+        FROM users
+        WHERE role NOT LIKE 'admin'
+        <if test="keyword != null and keyword != ''">
+            AND (LOWER(username) LIKE '%' || LOWER(#{keyword}) || '%')
+        </if>
+        ORDER BY created_at desc
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+    
+    <update id="updateUserStatus">
+        UPDATE users
+        SET STATUS = #{statusCode}
+        WHERE USER_ID = ${user_id}
+    </update>
+
+    <update id="updateUserListStatus">
+        UPDATE users
+        SET status = CASE status
+        WHEN 0 THEN 2
+        WHEN 2 THEN 0
+        END
+        WHERE username IN
+        <foreach item="username" index="index" collection="usernames" open="(" separator="," close=")">
+            #{username}
+        </foreach>
+    </update>
+
+    <select id="countTotalUserPages" parameterType="hashmap" resultType="int">
+        SELECT CEIL(count(*) / #{pageSize}) AS totalPages
+        FROM users
+        WHERE role NOT LIKE 'admin'
+    </select>
+</mapper>
