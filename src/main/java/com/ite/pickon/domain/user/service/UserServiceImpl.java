@@ -121,17 +121,23 @@ public class UserServiceImpl implements UserService {
      *
      * @param username 사용자명
      * @param password 비밀번호
-     * @param userId 사용자 ID
      * @return 생성된 JWT 토큰
      */
     @Override
-    public JwtToken login(String username, String password, Long userId) {
+    public JwtToken login(String username, String password) {
+        // 사용자 정보 조회
+        UserVO user = findByUsername(username);
+
+        // 비밀번호 검증
+        if (!encoder.matches(password, user.getPassword())) {
+            throw new CustomException(ErrorCode.FAIL_TO_LOGIN);
+        }
 
         // Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         // 검증된 인증 정보로 JWT 토큰 생성
-        return jwtTokenProvider.generateToken(authentication, userId);
+        return jwtTokenProvider.generateToken(authentication, user.getUser_id());
 
     }
 

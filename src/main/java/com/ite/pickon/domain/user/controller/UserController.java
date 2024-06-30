@@ -22,6 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,10 +74,9 @@ public class UserController {
      * @return 응답 객체
      */
     @PostMapping("/user/login")
-    public ResponseEntity<JwtToken> loginSuccess(@RequestBody UserVO user) {
+    public ResponseEntity<JwtToken> userLogin(@RequestBody UserVO user) {
         try {
-            UserVO userinfo = userService.findByUsername(user.getUsername());
-            JwtToken token = userService.login(user.getUsername(), user.getPassword(), userinfo.getUser_id());
+            JwtToken token = userService.login(user.getUsername(), user.getPassword());
             return ResponseEntity.ok(token);
         } catch(AuthenticationException e) {
             return ResponseEntity.status(401).build();
@@ -90,7 +91,7 @@ public class UserController {
      * @return 새로운 액세스 토큰
      */
     @PostMapping("/user/refresh")
-    public ResponseEntity<JwtToken> refresh(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<JwtToken> tokenRefresh(@RequestHeader("Authorization") String token) {
         String refreshToken = token.replace("Bearer ", "");
         JwtToken newAccessToken = jwtTokenProvider.generateAccessTokenFromRefreshToken(refreshToken);
         return ResponseEntity.ok(newAccessToken);
