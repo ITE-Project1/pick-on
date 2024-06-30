@@ -20,7 +20,7 @@ public interface UserService {
     void modifyUserListStatus(List<String> usernames);
 
     int getTotalPage(String keyword, int userPageSize);
-    JwtToken login(String username, String password, Long userId);
+    JwtToken login(String username, String password);
     void addTokenToBlacklist(String token);
     boolean isTokenBlacklisted(String token);
 }
