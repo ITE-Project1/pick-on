@@ -4,10 +4,8 @@ import com.ite.pickon.domain.order.OrderStatus;
 import com.ite.pickon.domain.order.dto.OrderVO;
 import com.ite.pickon.domain.order.dto.OrderInfoVO;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
-import com.ite.pickon.domain.sms.service.SmsService;
 import com.ite.pickon.domain.sms.template.SmsMessageTemplate;
 import com.ite.pickon.domain.sms.event.SmsSendEvent;
-import com.ite.pickon.domain.stock.service.StockService;
 import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.domain.transport.dto.TransportVO;
 import com.ite.pickon.domain.transport.mapper.TransportMapper;
@@ -35,8 +33,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final TransportMapper transportMapper;
     private final TransportService transportService;
-    private final StockService stockService;
-    private final SmsService smsService;
     private final SmsMessageTemplate smsMessageTemplate;
     private final ApplicationEventPublisher eventPublisher;
 

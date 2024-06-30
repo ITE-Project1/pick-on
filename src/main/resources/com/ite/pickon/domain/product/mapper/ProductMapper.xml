@@ -28,7 +28,7 @@
     </insert>
 
     <!-- 사업 확장을 고려했을 때 join하는 단일쿼리 방식이 상품/재고 각각의 쿼리 작성보다 효율적이다 -->
-    <select id="selectProductDetail" resultType="com.ite.pickon.domain.product.dto.ProductResponse">
+    <select id="selectProductDetail" resultType="com.ite.pickon.domain.product.dto.ProductInfoVO">
         select p.product_id  as productId,
                p.name        as name,
                p.description as description,

@@ -2,7 +2,7 @@ package com.ite.pickon.domain.product.mapper;
 
 import com.ite.pickon.domain.product.dto.ProductAdminVO;
 import com.ite.pickon.domain.product.dto.ProductListVO;
-import com.ite.pickon.domain.product.dto.ProductResponse;
+import com.ite.pickon.domain.product.dto.ProductInfoVO;
 import com.ite.pickon.domain.product.dto.ProductVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +37,7 @@ public interface ProductMapper {
      * @param productId 상품 ID
      * @return 상품 상세 정보 목록
      */
-    List<ProductResponse> selectProductDetail(String productId);
+    List<ProductInfoVO> selectProductDetail(String productId);
 
     /**
      * 기본 상품 목록 조회
