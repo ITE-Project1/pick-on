@@ -3,6 +3,7 @@ package com.ite.pickon.domain.order.service;
 import com.ite.pickon.domain.order.OrderStatus;
 import com.ite.pickon.domain.order.dto.OrderVO;
 import com.ite.pickon.domain.order.dto.OrderInfoVO;
+import com.ite.pickon.domain.order.event.OrderCompletedEvent;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
 import com.ite.pickon.domain.sms.service.SmsService;
 import com.ite.pickon.domain.sms.template.SmsMessageTemplate;
@@ -15,6 +16,7 @@ import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final StockService stockService;
     private final SmsService smsService;
     private final SmsMessageTemplate smsMessageTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 주문 생성 및 재고 요청 처리
@@ -75,8 +78,8 @@ public class OrderServiceImpl implements OrderService {
                 orderInfoVO.getProductName()
         );
 
-        // 문자 전송
-//        smsService.sendSms(orderInfoVO.getUserPhoneNumber(), message);
+        // 주문 완료 이벤트 발생 (SMS 전송)
+        eventPublisher.publishEvent(new OrderCompletedEvent(orderInfoVO.getUserPhoneNumber(), message));
 
         return orderInfoVO;
     }
@@ -257,7 +260,8 @@ public class OrderServiceImpl implements OrderService {
                         order.getToStore(),
                         order.getProductName()
                 );
-                smsService.sendSms(order.getUserPhoneNumber(), message);
+                // 픽업 가능 이벤트 발생 (SMS 전송)
+                eventPublisher.publishEvent(new OrderCompletedEvent(order.getUserPhoneNumber(), message));
             }
         } catch(Exception e) {
             e.printStackTrace();
