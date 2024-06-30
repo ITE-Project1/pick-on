@@ -2,7 +2,6 @@ package com.ite.pickon.domain.sms.service;
 
 import com.ite.pickon.config.EnvConfig;
 import com.ite.pickon.exception.CustomException;
-import lombok.extern.log4j.Log4j2;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
 import net.nurigo.sdk.message.model.Message;
@@ -14,7 +13,6 @@ import static com.ite.pickon.exception.ErrorCode.FAIL_SEND_SMS;
 import static com.ite.pickon.exception.ErrorCode.FAIL_SUBMIT_SMS;
 
 @Service
-@Log4j2
 public class CoolSmsService implements SmsService {
 
     // CoolSMS API 키
@@ -47,13 +45,10 @@ public class CoolSmsService implements SmsService {
             // 메시지 전송
             messageService.send(message);
         } catch (NurigoMessageNotReceivedException e) {
-            // 메시지 전송 실패 시 로그 기록 및 예외 처리
-            log.error(e.getFailedMessageList());
-            log.error(e.getMessage());
+            // 메시지 전송 실패
             throw new CustomException(FAIL_SUBMIT_SMS);
         } catch (Exception e) {
             // 일반적인 예외 처리
-            log.error(e.getMessage());
             throw new CustomException(FAIL_SEND_SMS);
         }
     }
