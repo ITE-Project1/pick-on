@@ -3,15 +3,16 @@ package com.ite.pickon.domain.order.service;
 import com.ite.pickon.domain.order.OrderStatus;
 import com.ite.pickon.domain.order.dto.OrderVO;
 import com.ite.pickon.domain.order.dto.OrderInfoVO;
-import com.ite.pickon.domain.order.event.OrderCompletedEvent;
 import com.ite.pickon.domain.order.mapper.OrderMapper;
 import com.ite.pickon.domain.sms.service.SmsService;
 import com.ite.pickon.domain.sms.template.SmsMessageTemplate;
+import com.ite.pickon.domain.sms.event.SmsSendEvent;
 import com.ite.pickon.domain.stock.service.StockService;
 import com.ite.pickon.domain.transport.TransportStatus;
 import com.ite.pickon.domain.transport.dto.TransportVO;
 import com.ite.pickon.domain.transport.mapper.TransportMapper;
 import com.ite.pickon.domain.transport.service.TransportService;
+
 import com.ite.pickon.exception.CustomException;
 import com.ite.pickon.exception.ErrorCode;
 import com.ite.pickon.response.ListResponse;
@@ -79,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         // 주문 완료 이벤트 발생 (SMS 전송)
-        eventPublisher.publishEvent(new OrderCompletedEvent(orderInfoVO.getUserPhoneNumber(), message));
+        eventPublisher.publishEvent(new SmsSendEvent(orderInfoVO.getUserPhoneNumber(), message));
 
         return orderInfoVO;
     }
@@ -261,7 +262,7 @@ public class OrderServiceImpl implements OrderService {
                         order.getProductName()
                 );
                 // 픽업 가능 이벤트 발생 (SMS 전송)
-                eventPublisher.publishEvent(new OrderCompletedEvent(order.getUserPhoneNumber(), message));
+                eventPublisher.publishEvent(new SmsSendEvent(order.getUserPhoneNumber(), message));
             }
         } catch(Exception e) {
             e.printStackTrace();

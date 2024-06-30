@@ -1,4 +1,4 @@
-package com.ite.pickon.domain.order.event;
+package com.ite.pickon.domain.sms.event;
 
 import com.ite.pickon.domain.sms.service.SmsService;
 import com.ite.pickon.exception.CustomException;
@@ -12,12 +12,12 @@ import static com.ite.pickon.exception.ErrorCode.FAIL_SEND_SMS;
 
 @Component
 @RequiredArgsConstructor
-public class OrderCompletedEventListener {
+public class SmsSendEventListener {
     private final SmsService smsService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderCompletedEvent(OrderCompletedEvent event) {
+    public void handleOrderCompletedEvent(SmsSendEvent event) {
         try {
             // SMS 발송
             smsService.sendSms(event.getUserPhoneNumber(), event.getMessage());
